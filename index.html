@@ -101,6 +101,51 @@
         </sc-for>
       </div>
 
+      <sc-if value="{{ module.isHistogram }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 4px; border: 1px solid #E1E9F4; border-radius: 12px; background: #F8FBFF; width: fit-content;">
+          <div style="height: 31px; padding: 0 13px; display: flex; align-items: center; border-radius: 9px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 11px; font-weight: 600;">Dashboard</div>
+          <div style="height: 31px; padding: 0 13px; display: flex; align-items: center; border-radius: 9px; color: #55677A; font-size: 11px; font-weight: 500;">Histograma</div>
+          <button onClick="{{ module.openTimesheet }}" style="height: 31px; padding: 0 13px; border: 0; border-radius: 9px; background: transparent; color: #55677A; font-size: 11px; font-weight: 500; cursor: pointer;">Lançamentos</button>
+          <div style="height: 31px; padding: 0 13px; display: flex; align-items: center; border-radius: 9px; color: #93A6B8; font-size: 11px; font-weight: 500;">Planejamento</div>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(360px, .9fr); gap: 16px; align-items: stretch;">
+          <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 18px; padding: 18px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div><div style="font-size: 16px; font-weight: 700; color: #0B2340;">Mão de obra por BSP</div><div style="font-size: 12px; color: #5B7185; margin-top: 4px;">Headcount e horas lançadas no período selecionado.</div></div>
+              <div style="flex: 1;"></div>
+              <button onClick="{{ module.openTimesheet }}" style="height: 32px; padding: 0 11px; border: 1px solid #E1E9F4; border-radius: 9px; background: #fff; color: #1355C2; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap;">Ver detalhes →</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 20px;">
+              <sc-for list="{{ module.histogramBsp }}" as="item" hint-placeholder-count="5">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                    <div style="min-width: 165px;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #1355C2;">{{ item.bsp }}</div><div style="font-size: 11px; color: #7E93A8; margin-top: 2px;">{{ item.unidade }}</div></div>
+                    <div style="flex: 1; height: 9px; overflow: hidden; border-radius: 999px; background: #EAF1F8;"><div style="width: {{ item.barW }}; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #1E86D8, #0E4AA8);"></div></div>
+                    <div style="min-width: 74px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #0B2340;">{{ item.horas }}</div>
+                  </div>
+                  <div style="display: flex; gap: 16px; padding-left: 177px; font-size: 11px; color: #5B7185;"><span>{{ item.pessoas }} pessoa(s)</span><span>{{ item.dias }} dia(s)</span><span>{{ item.fonte }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 18px; padding: 18px;">
+            <div style="font-size: 16px; font-weight: 700; color: #0B2340;">POB por dia</div>
+            <div style="font-size: 12px; color: #5B7185; margin-top: 4px;">Pessoas identificadas por data operacional.</div>
+            <div style="height: 190px; display: flex; align-items: flex-end; gap: 8px; margin-top: 24px; padding: 0 4px 24px; border-bottom: 1px solid #DCE5EE;">
+              <sc-for list="{{ module.histogramDays }}" as="day" hint-placeholder-count="10">
+                <div style="height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; min-width: 0;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #0B2340;">{{ day.pessoas }}</div>
+                  <div style="width: 100%; max-width: 30px; height: {{ day.barH }}px; border-radius: 7px 7px 3px 3px; background: linear-gradient(180deg, #1E86D8, #0E4AA8); box-shadow: 0 4px 10px rgba(14,74,168,.14);"></div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #7E93A8; transform: rotate(-45deg); transform-origin: center top; white-space: nowrap;">{{ day.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: 11px; color: #7E93A8;"><span>{{ module.histogramDaysLabel }}</span><span>Fonte: RDO / Timesheet</span></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 9px; padding: 12px 14px; border: 1px solid #DEEBF8; border-radius: 12px; background: linear-gradient(100deg, #EAF3FD, #F8FBFF); color: #45627D; font-size: 12px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #1E86D8;"></span>{{ module.histogramNote }}</div>
+      </sc-if>
+
       <sc-if value="{{ module.isBoard }}" hint-placeholder-val="{{ false }}">
         <div style="display: grid; grid-template-columns: repeat(4, minmax(230px,1fr)); gap: 12px; overflow-x: auto;">
           <sc-for list="{{ module.board }}" as="col" hint-placeholder-count="4">
@@ -1411,14 +1456,31 @@ class Component extends DCLogic {
       { k: 'H.E. / noturno', v: overtimeHours.toFixed(2) + ' h', sub: 'pendente de rate quando aplicável' }
     ];
     const tableRows = peopleCatalog.map(row => ({ cells: [row.name, row.func, row.bsp, row.dateLabel, row.normal.toFixed(2) + ' h', row.overtime.toFixed(2) + ' h', row.status] }));
+    const timesheetRows = rawPeople.filter(row => s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).sort((a, b) => (a.date + a.name).localeCompare(b.date + b.name)).map(row => ({
+      cells: [row.name, row.func, row.bsp, row.date || '—', row.normal.toFixed(2) + ' h', row.overtime.toFixed(2) + ' h', row.source]
+    }));
+    const histogramBase = all.map(bsp => {
+      const rows = rawPeople.filter(row => row.bsp === bsp.n);
+      const dates = new Set(rows.map(row => row.date).filter(Boolean));
+      const names = new Set(rows.map(row => row.name));
+      const hours = rows.reduce((sum, row) => sum + row.normal + row.overtime, 0);
+      return { bsp: bsp.n, unidade: bsp.un, pessoas: names.size, dias: dates.size, hours, horas: hours.toFixed(2) + ' h', fonte: rows.length ? (rows.some(row => row.source === 'Timesheet') ? 'Timesheet' : 'RDO') : 'Sem lançamentos' };
+    }).filter(row => s.moduleFilter === 'todos' || row.bsp === s.moduleFilter);
+    const maxHistogramHours = Math.max(1, ...histogramBase.map(row => row.hours));
+    const histogramBsp = histogramBase.map(row => ({ ...row, barW: Math.max(4, Math.round(row.hours / maxHistogramHours * 100)) + '%' }));
+    const histogramDays = Array.from(new Set(rawPeople.filter(row => s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).map(row => row.date).filter(Boolean))).sort().map(date => {
+      const people = new Set(rawPeople.filter(row => row.date === date && (s.moduleFilter === 'todos' || row.bsp === s.moduleFilter)).map(row => row.name)).size;
+      return { label: date.slice(8, 10) + '/' + date.slice(5, 7), pessoas: String(people), barH: Math.max(22, Math.min(135, people * 16)) };
+    });
+    const histogramDaysLabel = histogramDays.length ? histogramDays[0].label + ' → ' + histogramDays[histogramDays.length - 1].label : 'Nenhum dia localizado';
     const exportCsv = (name, rows) => () => {
       const csv = rows.map(row => row.map(value => '"' + String(value ?? '').replaceAll('"', '""') + '"').join(';')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a');
       link.href = url; link.download = name + '.csv'; link.click(); URL.revokeObjectURL(url);
     };
     const referenceModules = {
-      histograma: { titulo: 'Histograma Offshore', subtitulo: 'Lançamentos e presença por colaborador, BSP e período.', isTable: true, grid: '1.6fr 1fr .8fr .7fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.', 'Fonte'], rows: tableRows, tableNote: 'Dados operacionais derivados do snapshot da medição; a fonte original permanece somente leitura.' },
-      timesheet: { titulo: 'Timesheet Offshore', subtitulo: 'Cópia de leitura dos lançamentos do Timesheet e fallback documentado do RDO.', isTable: true, grid: '1.6fr 1fr .8fr .7fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.', 'Fonte'], rows: tableRows, tableNote: s.sourcePeople.length ? 'Timesheet/RDO sincronizados para o período selecionado.' : 'Nenhum Timesheet semanal foi localizado; os registros exibidos vêm do RDO concluído.' },
+      histograma: { titulo: 'Histograma Offshore', subtitulo: 'Visão consolidada de presença, headcount e ocupação por BSP e por dia.', isHistogram: true, histogramBsp, histogramDays, histogramDaysLabel, histogramNote: 'O Histograma consolida a presença operacional. Para conferir cada lançamento, abra a visão detalhada do Timesheet.', openTimesheet: () => this.setState({ modulo: 'timesheet', tela: 'painel', moduleFilter: s.moduleFilter }), isTable: false },
+      timesheet: { titulo: 'Timesheet Offshore', subtitulo: 'Lançamentos detalhados por pessoa, função, BSP e data, com horas normais e extras.', isTable: true, grid: '1.6fr 1.15fr .9fr .85fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Data', 'Horas normais', 'H.E.', 'Fonte'], rows: timesheetRows, tableNote: s.sourcePeople.length ? 'Cada linha representa um lançamento sincronizado do período. O Timesheet é a fonte detalhada usada para conferência.' : 'Nenhum Timesheet semanal foi localizado; os registros exibidos vêm do RDO concluído como fallback.' },
       collaborators: { titulo: 'Colaboradores', subtitulo: 'Cadastro central usado no Histograma, Timesheet, Rates e Medição.', isTable: true, grid: '1.8fr 1.2fr 1fr .8fr .8fr', columns: ['Nome', 'Função', 'BSP principal', 'Dias', 'Status'], rows: peopleCatalog.map(row => ({ cells: [row.name, row.func, row.bsp, row.dateLabel, 'Ativo'] })), tableNote: 'A consolidação usa o nome e a função informados pelas fontes operacionais.' },
       'rates-catalog': { titulo: 'Rates', subtitulo: 'Cadastro por cliente, unidade, BSP e função usado pelo cálculo automático do BM.', isTable: true, grid: '1.4fr 1fr 1fr 1fr 1fr 1fr', columns: ['Função', 'BSP', 'Diária', 'Hora extra', 'Noturno', 'Status'], rows: (s.rateCatalog || []).filter(row => !s.moduleFilter || s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).map(row => ({ cells: [row.employee_function, row.bsp || 'Todos', row.category === 'daily' ? brl(row.rate) : '—', row.category === 'overtime_hours' ? brl(row.rate) : '—', row.category === 'night_hours' ? brl(row.rate) : '—', 'Confirmado'] })), tableNote: s.rateCatalog && s.rateCatalog.length ? 'Confira os valores localizados e confirme qualquer alteração no BM antes de avançar.' : 'Nenhum rate confirmado ainda. Abra um BM, informe os valores da Commercial offer e confirme por cliente/função.' },
       costs: { titulo: 'Custos', subtitulo: 'Visão consolidada de hospedagem, transporte, passagens e demais custos.', isTable: true, grid: '1.4fr 1fr 1fr 1fr', columns: ['Tipo de custo', 'Registros', 'Total', 'Status'], rows: ['Hospedagem', 'Transporte', 'Passagens aéreas', 'Reembolsos'].map(name => ({ cells: [name, '0', brl(0), 'Aguardando integração'] })), tableNote: 'As fontes de custo ainda não estão conectadas ao schema de medição.' },
