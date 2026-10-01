@@ -28,7 +28,7 @@ try {
   for (const { bsp } of bspRows) {
     const draft = await client.query(
       'select medicao.generate_draft($1::text, $2::date, $3::date, null::text, $4::char(3)) as measurement_id',
-      [bsp, start, end, 'USD'],
+      [bsp, start, end, 'BRL'],
     );
     const measurementId = draft.rows[0].measurement_id;
     const { rows } = await client.query(`

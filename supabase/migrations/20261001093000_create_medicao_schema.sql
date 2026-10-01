@@ -126,7 +126,7 @@ create table if not exists medicao.rate_rules (
   bsp text,
   unit text not null,
   rate numeric(14, 4) not null check (rate >= 0),
-  currency char(3) not null default 'USD',
+  currency char(3) not null default 'BRL',
   valid_from date not null,
   valid_to date,
   active boolean not null default true,
@@ -149,7 +149,7 @@ create table if not exists medicao.measurements (
   status text not null default 'draft' check (status in (
     'draft', 'review_pm', 'sent_client', 'approved', 'invoiced', 'cancelled'
   )),
-  currency char(3) not null default 'USD',
+  currency char(3) not null default 'BRL',
   source_sync_run_id uuid references medicao.sync_runs(id),
   total_amount numeric(14, 2) not null default 0,
   calculation_hash text,
@@ -389,7 +389,7 @@ create or replace function medicao.generate_draft(
   p_period_start date,
   p_period_end date,
   p_project_key text default null,
-  p_currency char(3) default 'USD'
+  p_currency char(3) default 'BRL'
 )
 returns uuid
 language plpgsql

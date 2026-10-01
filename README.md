@@ -59,9 +59,13 @@ O comando sincroniza as fontes, cria um BM de rascunho por BSP e mostra linhas, 
 
 ## GitHub Pages
 
-O `index.html` na raiz é uma interface estática para teste. O workflow em `.github/workflows/deploy-pages.yml` publica a branch `main` quando o Pages está configurado como `GitHub Actions`.
+O `index.html` na raiz reproduz a interface do sistema de referência enviado no ZIP, incluindo painel de medição, novo boletim, boletim detalhado e controle de embarque. O workflow em `.github/workflows/deploy-pages.yml` publica a branch `main` quando o Pages está configurado como `GitHub Actions`.
 
-O Pages não recebe conexão de banco nem `service_role`. Para mostrar dados reais, configure uma API HTTPS protegida em `window.MEDICAO_API_BASE_URL` ou substitua a camada de backend mantendo a mesma resposta de `GET /measurement-summary`.
+O navegador consulta somente as projeções sanitizadas `public.medicao_dashboard_summary` e `public.medicao_dashboard_lines` pelo REST do Supabase. `config.js` contém apenas a URL e a chave publishable; nenhuma `service_role` ou URL de conexão do Postgres é publicada. Os dados brutos e o motor continuam protegidos no schema `medicao`.
+
+O painel seleciona a versão mais recente de cada BSP, exibe o período real, cliente/projeto/local, quantidade de linhas, pessoas, fonte (RDO/Timesheet) e alertas. Os detalhes carregam as linhas calculadas do BM. Quando não existe tarifa em `medicao.rate_rules`, a linha aparece com valor zero e validação de tarifa pendente; isso é intencional para impedir faturamento sem regra comercial cadastrada.
+
+URL de teste: `https://stepoil-debug.github.io/sistema-medicao/`
 
 ## Estado
 
