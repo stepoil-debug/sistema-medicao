@@ -57,6 +57,12 @@ npm run measurement:check -- 2026-09-16 2026-09-26
 
 O comando sincroniza as fontes, cria um BM de rascunho por BSP e mostra linhas, alertas e total calculado. As tarifas devem ser cadastradas em `medicao.rate_rules` antes de um BM poder ser aprovado/faturado.
 
+## GitHub Pages
+
+O `index.html` na raiz é uma interface estática para teste. O workflow em `.github/workflows/deploy-pages.yml` publica a branch `main` quando o Pages está configurado como `GitHub Actions`.
+
+O Pages não recebe conexão de banco nem `service_role`. Para mostrar dados reais, configure uma API HTTPS protegida em `window.MEDICAO_API_BASE_URL` ou substitua a camada de backend mantendo a mesma resposta de `GET /measurement-summary`.
+
 ## Estado
 
 Schema `medicao`, funções de sincronização/cálculo e validações implantados no banco de desenvolvimento. O ZIP e o Excel de referência não foram copiados nem alterados.

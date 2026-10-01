@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sistema independente de medição" />
+    <title>Sistema de Medição</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">STEPOIL · OPERATIONS</span>
+          <h1>Sistema de Medição</h1>
+          <p class="subtitle">Boletins rastreáveis a partir do RDO e Timesheet.</p>
+        </div>
+        <span id="connection-status" class="status status-pending">Backend pendente</span>
+      </header>
+
+      <section class="hero panel">
+        <div>
+          <span class="eyebrow">AMBIENTE DE TESTE</span>
+          <h2>Uma medição segura começa pela fonte certa.</h2>
+          <p>
+            Esta tela está pronta para receber os resultados do motor de medição.
+            O navegador nunca acessa o banco diretamente: a API deve entregar apenas
+            os dados autorizados para visualização.
+          </p>
+        </div>
+        <div class="hero-mark" aria-hidden="true">BM</div>
+      </section>
+
+      <section class="metrics" aria-label="Resumo da medição">
+        <article class="metric panel"><span>Boletins</span><strong id="bm-count">—</strong><small>retornados pela API</small></article>
+        <article class="metric panel"><span>Linhas</span><strong id="line-count">—</strong><small>itens calculados</small></article>
+        <article class="metric panel"><span>Valor atual</span><strong id="total-amount">—</strong><small id="currency">aguardando conexão</small></article>
+        <article class="metric panel"><span>Validações</span><strong id="validation-count">—</strong><small>erros e alertas</small></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel table-panel">
+          <div class="panel-heading"><div><span class="eyebrow">ÚLTIMOS BMs</span><h2>Medições disponíveis</h2></div><button id="refresh" type="button">Atualizar</button></div>
+          <div id="measurement-list" class="empty-state">Configure o endpoint da API para carregar as medições.</div>
+        </article>
+        <aside class="panel checklist">
+          <span class="eyebrow">CONTROLE</span>
+          <h2>Pronto para conectar</h2>
+          <ul>
+            <li><span class="dot done"></span>Schema isolado <code>medicao</code></li>
+            <li><span class="dot done"></span>RDO e Timesheet mapeados</li>
+            <li><span class="dot done"></span>Motor de cálculo validado</li>
+            <li><span class="dot pending"></span>API segura do backend</li>
+            <li><span class="dot pending"></span>Tarifas contratuais</li>
+          </ul>
+        </aside>
+      </section>
+
+      <footer>Versão de descoberta · cálculo final depende das tarifas e da aprovação do período.</footer>
+    </main>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
