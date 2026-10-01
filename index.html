@@ -509,7 +509,7 @@
         </div>
         <sc-for list="{{ bm.horas }}" as="h" hint-placeholder-count="3">
         <div style="display: grid; grid-template-columns: minmax(0,1fr) 80px 180px 80px 110px 130px; gap: 14px; padding: 11px 20px; border-top: 1px solid #F1F5F9; align-items: center;">
-          <div><div style="font-size: 13px; font-weight: 500; color: #0B2340;">{{ h.nome }}</div><div style="font-size: 11px; color: #5B7185; margin-top: 1px;">{{ h.funcao }}</div></div>
+          <div><div style="font-size: 13px; font-weight: 500; color: #0B2340;">{{ h.nome }}</div><div style="font-size: 11px; color: #5B7185; margin-top: 1px;">{{ h.funcao }}</div><div style="font-size: 10px; color: #93A6B8; margin-top: 2px;">{{ h.origem }}</div></div>
           <div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #EAF1FD; color: #1355C2;">{{ h.tipo }}</span></div>
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5B7185;">{{ h.dias }}</div>
           <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right;">{{ h.horas }}</div>
@@ -713,7 +713,7 @@ function pessoa(p, bsp) {
 function calc(b0, st, ov) {
   const b = Object.assign({ periodo: '26/08 a 25/09/2026' }, b0, ov || {});
   const pessoas = b.pessoas.map(p => pessoa(p, b.n));
-  const horas = b.horas.map(([nome, funcao, tipo, dias, h, r]) => ({ nome, funcao, tipo, dias: dias.map(i => DIAS[i].d + '/' + String(DIAS[i].m).padStart(2, '0')).join(', '), horas: h + ' h', rate: brl(r), totalN: h * r, total: brl(h * r) }));
+  const horas = b.horas.map(([nome, funcao, tipo, dias, h, r, origem]) => ({ nome, funcao, tipo, origem: origem || '', dias: dias.map(i => DIAS[i].d + '/' + String(DIAS[i].m).padStart(2, '0')).join(', '), horas: h + ' h', rate: brl(r), totalN: h * r, total: brl(h * r) }));
   const logistica = b.logistica.map(([nome, data, qtd, v, mk, t]) => ({ nome, data, qtd: String(qtd), valor: brl(v), markup: brl(mk), totalN: t, total: brl(t) }));
   const rentals = b.rentals.map(([desc, tag, entrega, nf, dias, r]) => ({ desc, tag, entrega, nf, dias: String(dias), rate: r ? brl(r) : 'incluso', totalN: dias * r, total: brl(dias * r), cor: r ? '#0B2340' : '#93A6B8' }));
   const consumiveis = b.consumiveis.map(([nf, material, un, qtd, data]) => ({ nf, material, un: brl(un), qtd: String(qtd), data, totalN: un * qtd, total: brl(un * qtd) }));
@@ -756,12 +756,17 @@ function liveDayIndex(value) {
   return DIAS.findIndex(day => String(day.m).padStart(2, '0') + '-' + day.d === key);
 }
 
-function livePeopleRows(row, peopleRows) {
+function livePeopleRows(row, peopleRows, lineRows) {
   const grouped = new Map();
   peopleRows.filter(person => person.measurement_id === row.id && person.source_mode === row.source_mode).forEach(person => {
     const key = (person.employee_name || 'Pessoa sem nome') + '|' + (person.employee_function || 'Função não informada');
     if (!grouped.has(key)) grouped.set(key, { name: person.employee_name || 'Pessoa sem nome', func: person.employee_function || 'Função não informada', rows: [] });
     grouped.get(key).rows.push(person);
+  });
+  const dailyRates = new Map();
+  (lineRows || []).filter(line => line.category === 'daily').forEach(line => {
+    const key = (line.employee_name || 'Pessoa sem nome') + '|' + (line.employee_function || 'Função não informada');
+    if (!dailyRates.has(key) && line.unit_rate != null) dailyRates.set(key, Number(line.unit_rate));
   });
   return Array.from(grouped.values()).map(group => {
     const dates = Array.from(new Set(group.rows.map(item => String(item.work_date).slice(0, 10)))).sort();
@@ -772,7 +777,7 @@ function livePeopleRows(row, peopleRows) {
     const normal = group.rows.reduce((total, item) => total + Number(item.normal_hours || 0), 0);
     const overtime = group.rows.reduce((total, item) => total + Number(item.overtime_hours || 0), 0);
     const detail = group.func + ' · ' + normal + 'h normais · ' + overtime + 'h extras';
-    return [group.name, detail, 0, spec, true];
+    return [group.name, detail, dailyRates.get(group.name + '|' + group.func) || 0, spec, true];
   });
 }
 
@@ -792,10 +797,11 @@ function liveBspRows(summary, lines, peopleRows) {
         liveCategoryName(line.category),
         dayIndex >= 0 ? [dayIndex] : [],
         Number(line.quantity || 0),
-        Number(line.unit_rate || 0)
+        Number(line.unit_rate || 0),
+        [line.rate_source_proposal, line.rate_source_section, line.rate_source_reference].filter(Boolean).join(' · ')
       ];
     });
-    const people = livePeopleRows(row, peopleRows || []);
+    const people = livePeopleRows(row, peopleRows || [], rowLines);
     return {
       n: row.bsp || 'Sem BSP',
       bm: String(row.version || 1).padStart(3, '0'),

@@ -14,6 +14,7 @@ try {
   await client.query(`
     insert into medicao.rate_rules (category, unit, rate, currency, valid_from, notes)
     values
+      ('daily', 'day', 100, 'USD', '2026-01-01', 'teste transacional'),
       ('normal_hours', 'hour', 100, 'USD', '2026-01-01', 'teste transacional'),
       ('overtime_hours', 'hour', 150, 'USD', '2026-01-01', 'teste transacional'),
       ('night_hours', 'hour', 180, 'USD', '2026-01-01', 'teste transacional'),
