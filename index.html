@@ -24,28 +24,33 @@
 <div style="width: 1680px; height: 1010px; background: #F4F8FB;">
 <div style="width: 100%; height: 100%; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column;">
 
-  <div style="flex: none; display: flex; align-items: center; gap: 16px; padding: 0 16px; height: 54px; background: #FFFFFF; border-bottom: 1px solid #EDF2F8;">
+  <div style="flex: none; display: flex; align-items: center; gap: 15px; padding: 0 18px; height: 58px; background: #FFFFFF; border-bottom: 1px solid #E5EDF6; box-shadow: 0 2px 10px rgba(11,35,64,.04); z-index: 2;">
     <div style="display: flex; gap: 7px;">
       <div style="width: 10px; height: 10px; border-radius: 50%; background: #E05C5C;"></div>
       <div style="width: 10px; height: 10px; border-radius: 50%; background: #F0B429;"></div>
       <div style="width: 10px; height: 10px; border-radius: 50%; background: #3CC29A;"></div>
     </div>
-    <img src="assets/step-logo.png" alt="STEP Integrated Solutions" style="height: 30px; width: auto; display: block; mix-blend-mode: multiply;">
-    <div style="width: 1px; height: 18px; background: #DCE5EE;"></div>
-    <div style="display: flex; gap: 4px; padding: 4px; border: 1px solid #E1E9F4; border-radius: 999px; background: #F8FBFF;">
-      <a href="Painel BSP.dc.html" style="height: 30px; padding: 0 14px; display: flex; align-items: center; border-radius: 999px; color: #55677A; font-size: 12px; font-weight: 500; white-space: nowrap; text-decoration: none;" style-hover="background: #EAF1F8; color: #0B2340; text-decoration: none;">Carteira de BSPs</a>
-      <span style="height: 30px; padding: 0 14px; display: flex; align-items: center; border-radius: 999px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;">Área de medição</span>
+    <img src="assets/step-logo.png" alt="STEP Integrated Solutions" style="height: 31px; width: auto; display: block; mix-blend-mode: multiply;">
+    <div style="width: 1px; height: 24px; background: #DCE5EE;"></div>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 4px; border: 1px solid #E1E9F4; border-radius: 999px; background: #F8FBFF; box-shadow: inset 0 1px 0 rgba(255,255,255,.8);">
+      <a href="Painel BSP.dc.html" style="height: 32px; padding: 0 15px; display: flex; align-items: center; border-radius: 999px; color: #55677A; font-size: 12px; font-weight: 500; white-space: nowrap; text-decoration: none;" style-hover="background: #EAF1F8; color: #0B2340; text-decoration: none;">Carteira de BSPs</a>
+      <span style="height: 32px; padding: 0 15px; display: flex; align-items: center; gap: 7px; border-radius: 999px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; box-shadow: 0 4px 12px rgba(14,74,168,.18);"><span style="width: 6px; height: 6px; border-radius: 50%; background: #BFE1FF;"></span>Área de medição</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 9px; padding-left: 5px; min-width: 185px;">
+      <div style="width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: linear-gradient(140deg, #1E86D8, #0E4AA8); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; box-shadow: 0 6px 14px rgba(14,74,168,.2);">BM</div>
+      <div><div style="font-size: 12px; font-weight: 700; color: #0B2340; line-height: 1.1;">Controle de medição</div><div style="font-size: 10px; color: #7E93A8; margin-top: 3px;">STEP · Operação</div></div>
     </div>
     <div style="flex: 1;"></div>
-    <span style="font-size: 12px; color: #5B7185;">Boletins criados aqui aparecem na fase Medição de cada BSP</span>
+    <div style="height: 34px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #DFF0E6; border-radius: 12px; background: #F3FBF6; color: #1B7A55; font-size: 12px; font-weight: 600; white-space: nowrap;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #2FA97C; box-shadow: 0 0 0 3px rgba(47,169,124,.12);"></span>Dados sincronizados</div>
+    <button onClick="{{ module.refresh }}" style="height: 36px; padding: 0 14px; display: flex; align-items: center; gap: 7px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;"><span style="font-size: 15px; line-height: 1; color: #1355C2;">↻</span>Atualizar</button>
     <div style="display: flex; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid #DCE5EE;">
-      <div style="width: 24px; height: 24px; border-radius: 50%; background: #1355C2; color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">RM</div>
+      <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(140deg, #1E86D8, #0E4AA8); color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(14,74,168,.16);">RM</div>
       <span style="font-size: 12px; color: #55677A;">R. Marques</span>
     </div>
   </div>
 
-  <div style="flex: none; display: flex; align-items: center; gap: 6px; padding: 0 22px; min-height: 48px; background: #223D5D; border-bottom: 1px solid #1B334F; overflow-x: auto;">
-    <div style="display: flex; align-items: center; gap: 8px; margin-right: 10px; padding-right: 14px; border-right: 1px solid rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap;">STEP · Operação</div>
+  <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 22px; min-height: 52px; background: #F4F8FB; border-bottom: 1px solid #E4EDF7; overflow-x: auto;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-right: 5px; padding-right: 14px; border-right: 1px solid #DCE5EE; color: #0B2340; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #1E86D8;"></span>Módulos</div>
     <sc-for list="{{ moduleNav }}" as="m" hint-placeholder-count="8">
       <button onClick="{{ m.click }}" style="{{ m.style }}">{{ m.nome }}</button>
     </sc-for>
@@ -1372,7 +1377,7 @@ class Component extends DCLogic {
       ['nominations', 'Nomeações'], ['transport', 'Transporte'], ['hospedagem', 'Hospedagem'], ['passagens', 'Passagens Aéreas'],
       ['reembolsos', 'Reembolsos'], ['collaborators', 'Colaboradores'], ['costs', 'Custos'], ['rates-catalog', 'Rates'],
       ['reports', 'Relatórios'], ['settings', 'Configurações'], ['flow-track', 'Flow Track']
-    ].map(([id, nome]) => ({ id, nome, click: () => this.setState({ modulo: id, tela: 'painel', moduleFilter: 'todos' }), style: s.modulo === id ? 'height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: #5D7894; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap;' : 'height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: rgba(255,255,255,.78); font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;' }));
+    ].map(([id, nome]) => ({ id, nome, click: () => this.setState({ modulo: id, tela: 'painel', moduleFilter: 'todos' }), style: s.modulo === id ? 'height: 34px; padding: 0 13px; border: 0; border-radius: 10px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 5px 12px rgba(14,74,168,.18);' : 'height: 34px; padding: 0 13px; border: 1px solid #E1E9F4; border-radius: 10px; background: #FFFFFF; color: #55677A; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;' }));
     const tabs = [{ id: 'painel', nome: 'Painel de medição' }, { id: 'novo', nome: 'Novo boletim' }]
       .map(t => ({ nome: t.nome, style: this.pill(s.modulo === 'medicao' && s.tela === t.id), click: () => this.setState({ modulo: 'medicao', tela: t.id }) }));
 
