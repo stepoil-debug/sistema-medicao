@@ -903,10 +903,11 @@ class Component extends DCLogic {
     });
 
     const totalAtual = all.reduce((a, b) => a + b.atual, 0);
+    const hasRatePending = all.some(b => Number(b.liveErrors || 0) > 0 || (b.liveSource && Number(b.liveLines || 0) === 0));
     const aBordo = all.reduce((a, b) => a + b.pessoas.filter(p => p.onboard).length, 0);
     const kpis = [
       { k: 'Boletins no período', v: String(all.length) },
-      { k: 'Valor em medição', v: brl(totalAtual) },
+      { k: 'Valor em medição', v: hasRatePending ? 'Pendente de rate' : brl(totalAtual) },
       { k: 'Aguardando cliente/PM', v: String(all.filter(b => b.st === 'Revisão PM' || b.st === 'Enviado ao cliente').length) },
       { k: 'Pessoas a bordo hoje', v: String(aBordo) }
     ];
