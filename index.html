@@ -70,7 +70,6 @@
       </div>
       <div style="flex: 1;"></div>
       <div style="display: flex; gap: 10px;">
-        <button onClick="{{ irEmbarques }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Ver histograma</button>
         <button onClick="{{ irNovo }}" style="height: 38px; padding: 0 17px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">+ Novo boletim</button>
       </div>
     </div>
@@ -133,8 +132,8 @@
               </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; flex: none;">
-              <button onClick="{{ b.abrir }}" style="height: 36px; padding: 0 15px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.2);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">Abrir boletim →</button>
-              <button onClick="{{ b.hist }}" style="height: 36px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Histograma</button>
+              <button onClick="{{ b.abrir }}" style="height: 36px; padding: 0 15px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.2);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">Abrir BSP →</button>
+              <button onClick="{{ b.hist }}" style="height: 36px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Controle de embarque</button>
             </div>
           </div>
           </sc-for>
@@ -262,12 +261,15 @@
   <div>
     <div style="background: #fff; border-bottom: 1px solid #EDF2F8; padding: 22px 26px 20px; display: flex; align-items: flex-start; gap: 20px;">
       <div>
-        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">Controle de embarque</div>
-        <div style="font-size: 27px; font-weight: 700; letter-spacing: -.025em; color: #0B2340; margin: 6px 0 5px;">Histograma de diárias</div>
-        <div style="font-size: 13px; color: #5B7185;">Cada dia lançado aqui alimenta a seção de diárias do boletim da BSP.</div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">BSP {{ embCtx.n }}</div>
+        <div style="font-size: 27px; font-weight: 700; letter-spacing: -.025em; color: #0B2340; margin: 6px 0 5px;">Controle de embarque</div>
+        <div style="font-size: 13px; color: #5B7185;">{{ embCtx.cliente }} · {{ embCtx.unidade }} · cada dia lançado alimenta o boletim desta BSP.</div>
       </div>
       <div style="flex: 1;"></div>
-      <button style="height: 38px; padding: 0 17px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">+ Lançar embarque</button>
+      <div style="display: flex; gap: 9px; align-items: center;">
+        <button onClick="{{ embCtx.irBsp }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">← Boletim da BSP</button>
+        <button style="height: 38px; padding: 0 17px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">+ Lançar embarque</button>
+      </div>
     </div>
 
     <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
@@ -338,9 +340,10 @@
   <sc-if value="{{ isBM }}" hint-placeholder-val="{{ false }}">
   <div>
     <div style="display: flex; align-items: center; gap: 12px; padding: 12px 26px; background: #fff; border-bottom: 1px solid #EDF2F8;">
-      <button onClick="{{ irPainel }}" style="height: 32px; padding: 0 14px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 500; color: #2C3E50; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">← Painel de medição</button>
+      <button onClick="{{ bm.irPainel }}" style="height: 32px; padding: 0 14px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 500; color: #2C3E50; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">← BSPs em medição</button>
       <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #93A6B8;">{{ bm.crumb }}</div>
       <div style="flex: 1;"></div>
+      <button onClick="{{ bm.irEmb }}" style="height: 32px; padding: 0 14px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 500; color: #2C3E50; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Controle de embarque</button>
       <span style="font-size: 12px; color: #5B7185;">Trocar BSP</span>
       <select value="{{ bm.n }}" onChange="{{ trocarBsp }}" style="height: 32px; padding: 0 11px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; font-family: 'IBM Plex Mono', monospace;">
         <sc-for list="{{ bspOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
@@ -974,6 +977,8 @@ class Component extends DCLogic {
     const bm = {
       n: cur.n, bm: cur.bm, cliente: cur.cli, unidade: cur.un, status: cur.st, stCor: ST[cur.st].c, stTint: ST[cur.st].t,
       crumb: 'Medição / BSP ' + cur.n + ' / BM ' + cur.bm, periodo: cur.periodo,
+      irPainel: () => this.setState({ tela: 'painel' }),
+      irEmb: () => this.setState({ tela: 'emb', filtro: cur.n }),
       acao: ACAO[idx],
       faixa: [
         { k: 'PO', v: cur.po, cor: cur.poVal ? '#24374B' : '#A45F00' },
@@ -1049,7 +1054,12 @@ class Component extends DCLogic {
         tela: 'bm', bsp: nb.n, secao: 'resumo', novoOff: {}
       }))
     };
-    const tabs = [{ id: 'painel', nome: 'Painel de medição' }, { id: 'novo', nome: 'Novo boletim' }, { id: 'bm', nome: 'Boletim de medição' }, { id: 'emb', nome: 'Controle de embarque' }]
+    const embCur = all.find(b => b.n === s.filtro) || cur;
+    const embCtx = {
+      n: embCur.n, cliente: embCur.cli, unidade: embCur.un,
+      irBsp: () => this.setState({ tela: 'bm', bsp: embCur.n, secao: 'resumo' })
+    };
+    const tabs = [{ id: 'painel', nome: 'Painel de medição' }, { id: 'novo', nome: 'Novo boletim' }]
       .map(t => ({ nome: t.nome, style: this.pill(s.tela === t.id), click: () => this.setState({ tela: t.id }) }));
 
     const periodoAtual = all[0] && all[0].periodo ? all[0].periodo : '26/08 – 25/09/2026';
@@ -1059,7 +1069,7 @@ class Component extends DCLogic {
       irEmbarques: go('emb'), irPainel: go('painel'),
       dias: DIAS, linhas, embKpis, filtros, legenda,
       embTotDias: embDias + ' dias embarcados · ' + dobDias + ' dobras', embTotValor: brl(embValor),
-      bm, bspOpts: all.map(b => ({ v: b.n, t: b.n + ' · BM ' + b.bm })),
+      bm, embCtx, bspOpts: all.map(b => ({ v: b.n, t: b.n + ' · BM ' + b.bm })),
       trocarBsp: e => this.setState({ bsp: e.target.value, secao: 'resumo' }),
       avancar: () => { if (idx < FLUXO.length - 1) this.setState(st => ({ st: Object.assign({}, st.st, { [cur.n]: FLUXO[idx + 1] }) })); },
       secResumo: s.secao === 'resumo', secVazia: s.secao !== 'resumo' && !temLinhas, secNome: secNome.toLowerCase(),
