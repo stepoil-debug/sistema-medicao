@@ -63,7 +63,7 @@ O `index.html` na raiz reproduz a interface do sistema de referência enviado no
 
 O navegador consulta somente as projeções sanitizadas `public.medicao_dashboard_summary` e `public.medicao_dashboard_lines` pelo REST do Supabase. `config.js` contém apenas a URL e a chave publishable; nenhuma `service_role` ou URL de conexão do Postgres é publicada. Os dados brutos e o motor continuam protegidos no schema `medicao`.
 
-O painel seleciona a versão mais recente de cada BSP, exibe o período real, cliente/projeto/local, quantidade de linhas, pessoas, fonte (RDO/Timesheet) e alertas. Os detalhes carregam as linhas calculadas do BM. Quando não existe tarifa em `medicao.rate_rules`, a linha aparece com valor zero e validação de tarifa pendente; isso é intencional para impedir faturamento sem regra comercial cadastrada.
+O painel seleciona a versão mais recente de cada BSP, exibe o período real, cliente/projeto/local, quantidade de linhas, pessoas, fonte (RDO/Timesheet) e alertas. Ao abrir um BSP, o sistema identifica cada pessoa registrada no período, função, dias presentes e horas normais/extras; a seção de horas carrega os lançamentos individualizados. Quando há Timesheet aprovado, ele é priorizado; na ausência dele, o RDO concluído é usado como fallback. Quando não existe tarifa em `medicao.rate_rules`, a linha aparece com valor zero e validação de tarifa pendente; isso é intencional para impedir faturamento sem regra comercial cadastrada.
 
 URL de teste: `https://stepoil-debug.github.io/sistema-medicao/`
 

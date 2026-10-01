@@ -473,7 +473,7 @@
           <div style="font-size: 12px; color: #5B7185;">Dobra = 2× rate · embarque cancelado = 0,5× rate</div>
         </div>
         <div style="display: grid; grid-template-columns: minmax(0,1fr) 296px 64px 64px 64px 104px 130px; gap: 14px; padding: 9px 20px; background: #F7FAFD; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B7C8F;">
-          <div>Colaborador</div><div>Histograma 26/08 → 25/09</div><div style="text-align: right;">Emb.</div><div style="text-align: right;">Dobra</div><div style="text-align: right;">Canc.</div><div style="text-align: right;">Rate</div><div style="text-align: right;">Total</div>
+          <div>Colaborador</div><div>Histograma {{ bm.periodo }}</div><div style="text-align: right;">Emb.</div><div style="text-align: right;">Dobra</div><div style="text-align: right;">Canc.</div><div style="text-align: right;">Rate</div><div style="text-align: right;">Total</div>
         </div>
         <sc-for list="{{ bm.pessoas }}" as="p" hint-placeholder-count="6">
         <div style="display: grid; grid-template-columns: minmax(0,1fr) 296px 64px 64px 64px 104px 130px; gap: 14px; padding: 11px 20px; border-top: 1px solid #F1F5F9; align-items: center;">
@@ -696,7 +696,7 @@ function seq(spec) { const a = Array(31).fill(''); spec.forEach(([c, f, t]) => {
 function numKey(n) { return n.split('-').map(x => x.padStart(5, '0')).join('-'); }
 
 function pessoa(p, bsp) {
-  const [nome, funcao, rate, spec] = p;
+  const [nome, funcao, rate, spec, liveOnboard] = p;
   const cod = seq(spec);
   const emb = cod.filter(c => c === 'E' || c === 'P').length;
   const dob = cod.filter(c => c === 'DO').length;
@@ -705,7 +705,7 @@ function pessoa(p, bsp) {
   return {
     nome: tc(nome), ini: ini(nome), funcao, bsp, rate: brl(rate), emb: String(emb), dob: String(dob), can: String(can),
     embN: emb, dobN: dob, totalN: total, total: brl(total),
-    onboard: ['E', 'P', 'DO'].indexOf(cod[30]) > -1,
+    onboard: liveOnboard == null ? ['E', 'P', 'DO'].indexOf(cod[30]) > -1 : liveOnboard,
     cells: cod.map((c, i) => c ? { t: c, bg: CODES[c].bg, fg: CODES[c].fg, col: DIAS[i].col, mini: CODES[c].mini } : { t: '', bg: 'transparent', fg: 'transparent', col: DIAS[i].col, mini: '#EEF3F9' })
   };
 }
@@ -740,7 +740,43 @@ function livePeriod(start, end) {
   return liveDate(start) + ' – ' + liveDate(end);
 }
 
-function liveBspRows(summary, lines) {
+function liveCategoryName(category) {
+  return ({
+    normal_hours: 'Horas normais',
+    overtime_hours: 'Horas extras',
+    night_hours: 'Adicional noturno',
+    standby_hours: 'Standby',
+    travel_hours: 'Viagem',
+    beyond_rotation_hours: 'Fora da rotação'
+  })[category] || String(category || 'Lançamento').replaceAll('_', ' ');
+}
+
+function liveDayIndex(value) {
+  const key = String(value || '').slice(5, 10);
+  return DIAS.findIndex(day => String(day.m).padStart(2, '0') + '-' + day.d === key);
+}
+
+function livePeopleRows(row, peopleRows) {
+  const grouped = new Map();
+  peopleRows.filter(person => person.measurement_id === row.id && person.source_mode === row.source_mode).forEach(person => {
+    const key = (person.employee_name || 'Pessoa sem nome') + '|' + (person.employee_function || 'Função não informada');
+    if (!grouped.has(key)) grouped.set(key, { name: person.employee_name || 'Pessoa sem nome', func: person.employee_function || 'Função não informada', rows: [] });
+    grouped.get(key).rows.push(person);
+  });
+  return Array.from(grouped.values()).map(group => {
+    const dates = Array.from(new Set(group.rows.map(item => String(item.work_date).slice(0, 10)))).sort();
+    const spec = dates.map(date => {
+      const index = liveDayIndex(date);
+      return index >= 0 ? ['E', index] : null;
+    }).filter(Boolean);
+    const normal = group.rows.reduce((total, item) => total + Number(item.normal_hours || 0), 0);
+    const overtime = group.rows.reduce((total, item) => total + Number(item.overtime_hours || 0), 0);
+    const detail = group.func + ' · ' + normal + 'h normais · ' + overtime + 'h extras';
+    return [group.name, detail, 0, spec, true];
+  });
+}
+
+function liveBspRows(summary, lines, peopleRows) {
   const byMeasurement = new Map();
   lines.forEach(line => {
     if (!byMeasurement.has(line.measurement_id)) byMeasurement.set(line.measurement_id, []);
@@ -748,14 +784,18 @@ function liveBspRows(summary, lines) {
   });
   return summary.map(row => {
     const rowLines = byMeasurement.get(row.id) || [];
-    const horas = rowLines.map(line => [
-      String(line.category || 'Lançamento').replaceAll('_', ' '),
-      String(line.source_system || 'Fonte'),
-      'HH', [], Number(line.quantity || 0), Number(line.unit_rate || 0)
-    ]);
-    const people = Array.from({ length: Number(row.people_count || 0) }, (_, i) => [
-      'Colaborador ' + (i + 1), 'Equipe', 0, []
-    ]);
+    const horas = rowLines.map(line => {
+      const dayIndex = liveDayIndex(line.service_date);
+      return [
+        line.employee_name || liveCategoryName(line.category),
+        line.employee_function || String(line.source_system || 'Fonte'),
+        liveCategoryName(line.category),
+        dayIndex >= 0 ? [dayIndex] : [],
+        Number(line.quantity || 0),
+        Number(line.unit_rate || 0)
+      ];
+    });
+    const people = livePeopleRows(row, peopleRows || []);
     return {
       n: row.bsp || 'Sem BSP',
       bm: String(row.version || 1).padStart(3, '0'),
@@ -805,13 +845,17 @@ class Component extends DCLogic {
       const summary = Array.from(latest.values());
       const ids = summary.map(row => row.id).filter(Boolean);
       let lines = [];
+      let people = [];
       if (ids.length) {
         const lineFilter = ids.join(',');
         const linesResponse = await fetch(base + 'medicao_dashboard_lines?select=*&measurement_id=in.(' + encodeURIComponent(lineFilter) + ')', { headers });
         if (!linesResponse.ok) throw new Error('Linhas HTTP ' + linesResponse.status);
         lines = await linesResponse.json();
+        const peopleResponse = await fetch(base + 'medicao_dashboard_people?select=*&measurement_id=in.(' + encodeURIComponent(lineFilter) + ')&order=work_date,employee_name', { headers });
+        if (!peopleResponse.ok) throw new Error('Pessoas HTTP ' + peopleResponse.status);
+        people = await peopleResponse.json();
       }
-      const live = liveBspRows(summary, lines);
+      const live = liveBspRows(summary, lines, people);
       if (live.length) this.setState({ liveBsps: live, bsp: live[0].n, novoBsp: live[0].n, liveError: '' });
     } catch (error) {
       this.setState({ liveError: error instanceof Error ? error.message : String(error) });
