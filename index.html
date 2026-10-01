@@ -81,7 +81,12 @@
         <div style="font-size: 13px; color: #5B7185;">{{ module.subtitulo }}</div>
       </div>
       <div style="flex: 1;"></div>
-      <button onClick="{{ module.refresh }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;">Atualizar dados</button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <sc-if value="{{ module.canCreate }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ module.openNew }}" style="height: 38px; padding: 0 15px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.18);">+ {{ module.newLabel }}</button>
+        </sc-if>
+        <button onClick="{{ module.refresh }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;">Atualizar dados</button>
+      </div>
     </div>
 
     <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
@@ -100,6 +105,26 @@
           <button onClick="{{ f.click }}" style="{{ f.style }}">{{ f.nome }}</button>
         </sc-for>
       </div>
+
+      <sc-if value="{{ module.isNewForm }}" hint-placeholder-val="{{ false }}">
+        <div style="background: #fff; border: 1px solid #CFE0F3; border-radius: 18px; padding: 18px; box-shadow: 0 8px 22px rgba(14,74,168,.08);">
+          <div style="display: flex; align-items: flex-start; gap: 16px;">
+            <div><div style="font-size: 16px; font-weight: 700; color: #0B2340;">{{ module.newTitle }}</div><div style="font-size: 12px; color: #5B7185; margin-top: 4px;">Preencha os campos e salve como rascunho para revisão antes de enviar ao banco ou ao cliente.</div></div>
+            <div style="flex: 1;"></div>
+            <button onClick="{{ module.cancelNew }}" style="height: 32px; padding: 0 12px; border: 1px solid #E1E9F4; border-radius: 9px; background: #fff; color: #55677A; font-size: 12px; cursor: pointer;">Fechar</button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(210px, 1fr)); gap: 12px; margin-top: 16px;">
+            <sc-for list="{{ module.formFields }}" as="field" hint-placeholder-count="6">
+              <label style="display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #7E93A8;">{{ field.label }}</span><input type="{{ field.type }}" value="{{ field.value }}" placeholder="{{ field.placeholder }}" onInput="{{ field.onInput }}" style="height: 36px; width: 100%; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px; background: #fff; color: #24374B; font-size: 12px;"></label>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 9px; margin-top: 16px;"><button onClick="{{ module.cancelNew }}" style="height: 36px; padding: 0 14px; border: 1px solid #E1E9F4; border-radius: 10px; background: #fff; color: #55677A; font-size: 12px; cursor: pointer;">Cancelar</button><button onClick="{{ module.saveNew }}" style="height: 36px; padding: 0 16px; border: 0; border-radius: 10px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">Salvar rascunho</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ module.hasDrafts }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 12px 14px; border: 1px solid #DFF0E6; border-radius: 12px; background: #F3FBF6; color: #1B7A55; font-size: 12px;">{{ module.draftMessage }}</div>
+      </sc-if>
 
       <sc-if value="{{ module.isHistogram }}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; align-items: center; gap: 8px; padding: 4px; border: 1px solid #E1E9F4; border-radius: 12px; background: #F8FBFF; width: fit-content;">
@@ -1071,9 +1096,13 @@ function liveBspRows(summary, lines, peopleRows) {
 }
 
 class Component extends DCLogic {
-  state = { modulo: 'medicao', tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', moduleFilter: 'todos', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, sourceLines: [], sourcePeople: [], liveError: '', rateCatalog: [], rateError: '', rateDraft: {}, rateSaving: false };
+  state = { modulo: 'medicao', tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', moduleFilter: 'todos', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, sourceLines: [], sourcePeople: [], liveError: '', rateCatalog: [], rateError: '', rateDraft: {}, rateSaving: false, newModule: '', moduleDraft: {}, moduleDrafts: {} };
 
   componentDidMount() {
+    try {
+      const storedDrafts = window.localStorage.getItem('medicao_module_drafts');
+      if (storedDrafts) this.setState({ moduleDrafts: JSON.parse(storedDrafts) });
+    } catch (error) { console.warn('[medicao] não foi possível restaurar rascunhos locais', error); }
     this.loadLiveData();
     this.loadRateCatalog();
   }
@@ -1478,6 +1507,18 @@ class Component extends DCLogic {
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a');
       link.href = url; link.download = name + '.csv'; link.click(); URL.revokeObjectURL(url);
     };
+    const moduleFormDefinitions = {
+      histograma: { label: 'Novo lançamento', title: 'Novo lançamento no Histograma', fields: [['bsp', 'BSP', 'text', '25-701'], ['nome', 'Colaborador', 'text', 'Nome completo'], ['funcao', 'Função', 'text', 'Função no embarque'], ['data', 'Data', 'date', ''], ['normal', 'Horas normais', 'number', '12'], ['extra', 'Hora extra', 'number', '0']] },
+      timesheet: { label: 'Novo lançamento', title: 'Novo lançamento de Timesheet', fields: [['bsp', 'BSP', 'text', '25-701'], ['nome', 'Colaborador', 'text', 'Nome completo'], ['funcao', 'Função', 'text', 'Função no embarque'], ['data', 'Data', 'date', ''], ['normal', 'Horas normais', 'number', '12'], ['extra', 'Hora extra', 'number', '0']] },
+      nominations: { label: 'Nova solicitação', title: 'Nova solicitação de nomeação', fields: [['bsp', 'BSP', 'text', '25-701'], ['funcao', 'Função', 'text', 'Função solicitada'], ['quantidade', 'Quantidade', 'number', '1'], ['embarque', 'Data de embarque', 'date', ''], ['desembarque', 'Data de desembarque', 'date', ''], ['observacao', 'Observação', 'text', 'Requisitos ou observações']] },
+      transport: { label: 'Novo transporte', title: 'Nova solicitação de transporte', fields: [['solicitante', 'Solicitante', 'text', 'Nome'], ['bsp', 'BSP', 'text', '25-701'], ['origem', 'Origem', 'text', 'Cidade / aeroporto'], ['destino', 'Destino', 'text', 'Unidade / aeroporto'], ['data', 'Data', 'date', ''], ['observacao', 'Observação', 'text', 'Bagagem, voo ou necessidade']] },
+      hospedagem: { label: 'Nova hospedagem', title: 'Nova reserva de hospedagem', fields: [['colaborador', 'Colaborador', 'text', 'Nome'], ['hotel', 'Hotel', 'text', 'Nome do hotel'], ['entrada', 'Entrada', 'date', ''], ['saida', 'Saída', 'date', ''], ['bsp', 'BSP', 'text', '25-701'], ['quartos', 'Quartos', 'number', '1']] },
+      passagens: { label: 'Nova passagem', title: 'Nova solicitação de passagem aérea', fields: [['passageiro', 'Passageiro', 'text', 'Nome'], ['trecho', 'Trecho', 'text', 'Origem → destino'], ['data', 'Data do voo', 'date', ''], ['bsp', 'BSP', 'text', '25-701'], ['companhia', 'Companhia', 'text', 'Companhia aérea'], ['observacao', 'Observação', 'text', 'Bagagem ou conexão']] },
+      reembolsos: { label: 'Novo reembolso', title: 'Nova solicitação de reembolso', fields: [['colaborador', 'Colaborador', 'text', 'Nome'], ['despesa', 'Despesa', 'text', 'Descrição'], ['data', 'Data', 'date', ''], ['valor', 'Valor', 'number', '0,00'], ['bsp', 'BSP', 'text', '25-701'], ['observacao', 'Observação', 'text', 'Centro de custo / comprovante']] },
+      collaborators: { label: 'Novo colaborador', title: 'Novo cadastro de colaborador', fields: [['nome', 'Nome completo', 'text', 'Nome'], ['funcao', 'Função', 'text', 'Função principal'], ['cidade', 'Cidade de residência', 'text', 'Cidade'], ['email', 'E-mail', 'email', 'nome@empresa.com'], ['telefone', 'Telefone', 'text', '(00) 00000-0000'], ['status', 'Status', 'text', 'Ativo']] },
+      costs: { label: 'Novo custo', title: 'Novo lançamento de custo', fields: [['tipo', 'Tipo de custo', 'text', 'Hospedagem / transporte / passagem'], ['cliente', 'Cliente', 'text', 'Cliente'], ['bsp', 'BSP', 'text', '25-701'], ['data', 'Data', 'date', ''], ['valor', 'Valor', 'number', '0,00'], ['observacao', 'Observação', 'text', 'Detalhamento do custo']] },
+      'rates-catalog': { label: 'Novo rate', title: 'Novo rate por cliente e função', fields: [['cliente', 'Cliente', 'text', 'Cliente'], ['unidade', 'Unidade / embarcação', 'text', 'Unidade'], ['bsp', 'BSP', 'text', '25-701'], ['funcao', 'Função', 'text', 'Função comercial'], ['diaria', 'Diária', 'number', '0,00'], ['extra', 'Hora extra', 'number', '0,00'], ['noturno', 'Adicional noturno', 'number', '0,00']] }
+    };
     const referenceModules = {
       histograma: { titulo: 'Histograma Offshore', subtitulo: 'Visão consolidada de presença, headcount e ocupação por BSP e por dia.', isHistogram: true, histogramBsp, histogramDays, histogramDaysLabel, histogramNote: 'O Histograma consolida a presença operacional. Para conferir cada lançamento, abra a visão detalhada do Timesheet.', openTimesheet: () => this.setState({ modulo: 'timesheet', tela: 'painel', moduleFilter: s.moduleFilter }), isTable: false },
       timesheet: { titulo: 'Timesheet Offshore', subtitulo: 'Lançamentos detalhados por pessoa, função, BSP e data, com horas normais e extras.', isTable: true, grid: '1.6fr 1.15fr .9fr .85fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Data', 'Horas normais', 'H.E.', 'Fonte'], rows: timesheetRows, tableNote: s.sourcePeople.length ? 'Cada linha representa um lançamento sincronizado do período. O Timesheet é a fonte detalhada usada para conferência.' : 'Nenhum Timesheet semanal foi localizado; os registros exibidos vêm do RDO concluído como fallback.' },
@@ -1521,6 +1562,27 @@ class Component extends DCLogic {
     module.filters = module.filters || moduleFilters;
     module.refresh = () => this.loadLiveData();
     module.isReference = s.modulo !== 'medicao';
+    const formDefinition = moduleFormDefinitions[s.modulo];
+    const moduleDrafts = s.moduleDrafts[s.modulo] || [];
+    module.canCreate = Boolean(formDefinition);
+    module.newLabel = formDefinition ? formDefinition.label : '';
+    module.newTitle = formDefinition ? formDefinition.title : '';
+    module.isNewForm = Boolean(formDefinition && s.newModule === s.modulo);
+    module.formFields = formDefinition ? formDefinition.fields.map(([id, label, type, placeholder]) => ({
+      id, label, type, placeholder, value: s.moduleDraft[id] || '',
+      onInput: e => this.setState(st => ({ moduleDraft: Object.assign({}, st.moduleDraft, { [id]: e.target.value }) }))
+    })) : [];
+    module.openNew = formDefinition ? () => this.setState({ newModule: s.modulo, moduleDraft: {}, moduleMessage: '' }) : () => undefined;
+    module.cancelNew = () => this.setState({ newModule: '', moduleDraft: {} });
+    module.saveNew = () => this.setState(st => {
+      const entry = Object.assign({}, st.moduleDraft, { createdAt: new Date().toISOString() });
+      const drafts = (st.moduleDrafts[s.modulo] || []).concat(entry);
+      const nextDrafts = Object.assign({}, st.moduleDrafts, { [s.modulo]: drafts });
+      try { window.localStorage.setItem('medicao_module_drafts', JSON.stringify(nextDrafts)); } catch (error) { console.warn('[medicao] não foi possível salvar rascunho local', error); }
+      return { moduleDrafts: nextDrafts, newModule: '', moduleDraft: {}, moduleMessage: 'Rascunho incluído neste navegador. Confirme os dados e integre à fonte oficial antes do fechamento.' };
+    });
+    module.hasDrafts = moduleDrafts.length > 0 || (s.moduleMessage && s.moduleMessageModule === s.modulo);
+    module.draftMessage = moduleDrafts.length ? moduleDrafts.length + ' rascunho(s) salvo(s) neste navegador. ' + (s.moduleMessage || 'Eles permanecem aguardando confirmação.') : (s.moduleMessage || '');
 
     const periodoAtual = all[0] && all[0].periodo ? all[0].periodo : '26/08 – 25/09/2026';
     return {
