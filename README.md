@@ -45,7 +45,18 @@ Timesheet/RDO/outras fontes
 - `src/`: reservado para o código do produto.
 - `tests/`: reservado para testes do motor de cálculo e integrações.
 
+## Execução no ambiente conectado
+
+Com `SUPABASE_DB_URL_DASHBOARD` configurada em variável de ambiente:
+
+```bash
+npm install
+npm run db:migrate
+npm run measurement:check -- 2026-09-16 2026-09-26
+```
+
+O comando sincroniza as fontes, cria um BM de rascunho por BSP e mostra linhas, alertas e total calculado. As tarifas devem ser cadastradas em `medicao.rate_rules` antes de um BM poder ser aprovado/faturado.
+
 ## Estado
 
-Repositório inicial criado em fase de descoberta e arquitetura. O ZIP e o Excel de referência não foram copiados nem alterados.
-
+Schema `medicao`, funções de sincronização/cálculo e validações implantados no banco de desenvolvimento. O ZIP e o Excel de referência não foram copiados nem alterados.

@@ -1,0 +1,23 @@
+{
+  "name": "sistema-medicao",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema independente de medição com integração ao RDO e Timesheet.",
+  "scripts": {
+    "db:inspect": "node scripts/inspect-databases.mjs",
+    "db:inspect:sources": "node scripts/inspect-offshore-source.mjs",
+    "db:migrate": "node scripts/apply-migration.mjs",
+    "db:sync": "node scripts/run-draft-check.mjs",
+    "measurement:check": "node scripts/run-draft-check.mjs",
+    "measurement:verify": "node scripts/verify-engine.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}
