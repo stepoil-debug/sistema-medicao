@@ -8,6 +8,7 @@
     "db:inspect:sources": "node scripts/inspect-offshore-source.mjs",
     "db:migrate": "node scripts/apply-migration.mjs",
     "db:sync": "node scripts/run-draft-check.mjs",
+    "measurement:sync": "node scripts/run-draft-check.mjs",
     "measurement:check": "node scripts/run-draft-check.mjs",
     "measurement:verify": "node scripts/verify-engine.mjs",
     "test": "node --test"

@@ -52,10 +52,10 @@ Com `SUPABASE_DB_URL_DASHBOARD` configurada em variável de ambiente:
 ```bash
 npm install
 npm run db:migrate
-npm run measurement:check -- 2026-09-16 2026-09-26
+npm run measurement:sync -- 2026-09-16 2026-09-26
 ```
 
-O comando sincroniza as fontes, cria um BM de rascunho por BSP e mostra linhas, alertas e total calculado. As tarifas devem ser cadastradas em `medicao.rate_rules` antes de um BM poder ser aprovado/faturado.
+O comando sincroniza as fontes, atualiza o snapshot semanal/dia do Timesheet, cria um BM de rascunho por BSP e mostra linhas, alertas e total calculado. A rotina SQL equivalente para um backend agendado é `medicao.sync_and_generate_drafts(data_inicial, data_final, bsp, moeda)`. As tarifas devem ser cadastradas em `medicao.rate_rules` ou confirmadas pelo cadastro de cliente antes de um BM poder ser aprovado/faturado.
 
 ## GitHub Pages
 
@@ -66,6 +66,8 @@ O navegador consulta somente as projeções sanitizadas `public.medicao_dashboar
 O painel seleciona a versão mais recente de cada BSP, exibe o período real, cliente/projeto/local, quantidade de linhas, pessoas, fonte (RDO/Timesheet) e alertas. Ao abrir um BSP, o sistema identifica cada pessoa registrada no período, função, dias presentes e horas normais/extras; a seção de horas carrega os lançamentos individualizados. Quando há Timesheet aprovado, ele é priorizado; na ausência dele, o RDO concluído é usado como fallback. Quando não existe tarifa em `medicao.rate_rules`, a linha aparece com valor zero e validação de tarifa pendente; isso é intencional para impedir faturamento sem regra comercial cadastrada.
 
 URL de teste: `https://stepoil-debug.github.io/sistema-medicao/`
+
+Na primeira sincronização validada do ambiente, o RDO retornou 18 documentos e 70 apontamentos individuais concluídos. O `offshore_ts` ainda não possuía semanas/tarefas; nesse cenário o motor usa o RDO como fallback e mantém o alerta de fonte/rate para revisão.
 
 ## Estado
 
