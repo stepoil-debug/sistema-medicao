@@ -723,7 +723,9 @@ function calc(b0, st, ov) {
   if (b.off) Object.keys(b.off).forEach(k => { if (b.off[k]) vals[k] = 0; });
   const atual = Object.keys(vals).reduce((a, k) => a + vals[k], 0);
   const saldo = b.poVal ? b.poVal - b.emit - atual : null;
-  return Object.assign({}, b, { st, pessoas, horas, logistica, rentals, consumiveis, vals, counts, atual, saldo });
+  const ratePending = Number(b.liveErrors || 0) > 0 || (b.liveSource && Number(b.liveLines || 0) === 0);
+  return Object.assign({}, b, { st, pessoas, horas, logistica, rentals, consumiveis, vals, counts, atual, saldo,
+    atualLabel: ratePending ? 'Pendente de rate' : brl(atual) });
 }
 
 function liveStatus(status) {
@@ -889,7 +891,7 @@ class Component extends DCLogic {
       const excede = b.saldo != null && b.saldo < 0;
       return {
         n: b.n, bm: b.bm, cliente: b.cli, unidade: b.un, status: b.st, stCor: ST[b.st].c, stTint: ST[b.st].t, pm: b.pm,
-        po: b.po, poVal: b.poVal ? brl(b.poVal) : '—', emit: b.emit ? brl(b.emit) : '—', atual: brl(b.atual),
+        po: b.po, poVal: b.poVal ? brl(b.poVal) : '—', emit: b.emit ? brl(b.emit) : '—', atual: b.atualLabel,
         saldo: b.saldo == null ? '—' : brl(b.saldo), saldoCor: b.saldo == null ? '#93A6B8' : (b.saldo < 0 ? '#D93B3B' : '#1B7A55'),
         aBordo: b.pessoas.filter(p => p.onboard).length + ' de ' + b.pessoas.length,
         wEmit: b.poVal ? (b.emit / tot * 100) + '%' : '0%', wAtual: b.poVal ? (b.atual / tot * 100) + '%' : '0%',
@@ -915,6 +917,7 @@ class Component extends DCLogic {
     if (s.liveError) alertas.push({ texto: 'Não foi possível atualizar os dados reais do banco.', meta: s.liveError, cor: '#D93B3B', tint: '#FDECEA' });
     all.forEach(b => {
       if (!b.poVal) alertas.push({ texto: 'BSP ' + b.n + ' sem valor de PO cadastrado — saldo do contrato não pode ser calculado.', meta: b.cli + ' · BM ' + b.bm, cor: '#E08A00', tint: '#FFF7EC' });
+      if (b.liveErrors > 0) alertas.push({ texto: 'BSP ' + b.n + ' sem rate da proposta BPP — medição não calculada.', meta: b.liveErrors + ' validação(ões) de tarifa · fonte esperada: Commercial offer', cor: '#D93B3B', tint: '#FDECEA' });
       if (b.saldo != null && b.saldo < 0) alertas.push({ texto: 'BM ' + b.bm + ' da BSP ' + b.n + ' ultrapassa o saldo da PO.', meta: 'Excedente ' + brl(-b.saldo) + ' · ' + b.cli, cor: '#D93B3B', tint: '#FDECEA' });
     });
     const rasc = all.filter(b => b.st === 'Rascunho').length;
@@ -961,7 +964,7 @@ class Component extends DCLogic {
         historico.push({ n, periodo: '26/' + String(m + 1).padStart(2, '0') + ' – 25/' + String(m + 2).padStart(2, '0'), status: 'Faturado', tint: ST['Faturado'].t, cor: ST['Faturado'].c, valor: brl(cur.emit * pesos[i] / ps) });
       }
     }
-    historico.push({ n: cur.bm, periodo: '26/08 – 25/09', status: cur.st, tint: ST[cur.st].t, cor: ST[cur.st].c, valor: brl(cur.atual) });
+    historico.push({ n: cur.bm, periodo: '26/08 – 25/09', status: cur.st, tint: ST[cur.st].t, cor: ST[cur.st].c, valor: cur.atualLabel });
 
     const secList = { diarias: cur.pessoas, horas: cur.horas, logistica: cur.logistica, rentals: cur.rentals, consumiveis: cur.consumiveis, mob: [], habitat: [] };
     const temLinhas = s.secao !== 'resumo' && secList[s.secao].length > 0;
@@ -975,7 +978,7 @@ class Component extends DCLogic {
         { k: 'PO', v: cur.po, cor: cur.poVal ? '#24374B' : '#A45F00' },
         { k: 'Valor da PO', v: cur.poVal ? brl(cur.poVal) : '—', cor: '#24374B' },
         { k: 'BMs emitidos', v: cur.emit ? brl(cur.emit) : '—', cor: '#24374B' },
-        { k: 'BM atual', v: brl(cur.atual), cor: '#0B2340' },
+        { k: 'BM atual', v: cur.atualLabel, cor: cur.liveErrors > 0 ? '#D93B3B' : '#0B2340' },
         { k: 'Saldo', v: cur.saldo == null ? '—' : brl(cur.saldo), cor: cur.saldo == null ? '#93A6B8' : (cur.saldo < 0 ? '#D93B3B' : '#1B7A55') },
         { k: 'PM', v: cur.pm, cor: '#24374B' },
         { k: 'Data', v: '23/09/2026', cor: '#24374B' }
@@ -989,11 +992,11 @@ class Component extends DCLogic {
           linha: last ? 'transparent' : (done ? '#3CB88A' : '#E7EFF9')
         };
       }),
-      secoes, resumo, total: brl(cur.atual), historico,
+      secoes, resumo, total: cur.atualLabel, historico,
       saldoLinhas: [
         { k: 'Valor da PO', v: cur.poVal ? brl(cur.poVal) : 'não informada', cor: cur.poVal ? '#0B2340' : '#A45F00' },
         { k: 'BMs emitidos', v: cur.emit ? brl(cur.emit) : '—', cor: '#0B2340' },
-        { k: 'BM atual', v: brl(cur.atual), cor: '#0B2340' },
+        { k: 'BM atual', v: cur.atualLabel, cor: cur.liveErrors > 0 ? '#D93B3B' : '#0B2340' },
         { k: 'Saldo após este BM', v: cur.saldo == null ? '—' : brl(cur.saldo), cor: cur.saldo == null ? '#93A6B8' : (cur.saldo < 0 ? '#D93B3B' : '#1B7A55') }
       ],
       wEmit: cur.poVal ? (cur.emit / tot * 100) + '%' : '0%', wAtual: cur.poVal ? (cur.atual / tot * 100) + '%' : '0%',
@@ -1001,7 +1004,7 @@ class Component extends DCLogic {
       usoTexto: !cur.poVal ? 'Cadastre o valor da PO para acompanhar o saldo do contrato.' : (excede ? 'Este boletim excede a PO em ' + brl(-cur.saldo) + '. Solicite aditivo antes de enviar ao cliente.' : Math.round((cur.emit + cur.atual) / cur.poVal * 100) + '% da PO consumida após este boletim.'),
       usoCor: !cur.poVal ? '#A45F00' : (excede ? '#D93B3B' : '#5B7185'),
       pessoas: cur.pessoas, horas: cur.horas, logistica: cur.logistica, rentals: cur.rentals, consumiveis: cur.consumiveis,
-      secTotal: s.secao === 'resumo' ? brl(cur.atual) : brl(cur.vals[s.secao] || 0)
+      secTotal: s.secao === 'resumo' ? cur.atualLabel : (cur.liveErrors > 0 && ['diarias', 'horas'].includes(s.secao) ? 'Pendente de rate' : brl(cur.vals[s.secao] || 0))
     };
 
 
@@ -1015,7 +1018,7 @@ class Component extends DCLogic {
     const emitNovo = nb.emit + nb.atual;
     const saldoNovo = nb.poVal ? nb.poVal - emitNovo - totNovo : null;
     const novo = {
-      n: nb.n, num: proxNum, cliente: nb.cli + ' · ' + nb.un, per: perSel.v, periodos, total: brl(totNovo),
+      n: nb.n, num: proxNum, cliente: nb.cli + ' · ' + nb.un, per: perSel.v, periodos, total: nb.liveErrors > 0 ? 'Pendente de rate' : brl(totNovo),
       onPer: e => this.setState({ novoPer: e.target.value }),
       bsps: all.map(b => {
         const on = b.n === nb.n;

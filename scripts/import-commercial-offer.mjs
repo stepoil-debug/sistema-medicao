@@ -113,8 +113,32 @@ try {
     ]);
   }
 
+  // Rebuild existing draft measurements for this BSP so a rate import is
+  // immediately reflected in the live dashboard. The generator creates the
+  // next version and keeps the previous draft available for audit.
+  const drafts = await client.query(`
+    select bsp, period_start, period_end, project_key, currency
+    from medicao.measurements
+    where medicao.normalize_bsp(bsp) = medicao.normalize_bsp($1)
+      and status = 'draft'
+    group by bsp, period_start, period_end, project_key, currency
+    order by period_start, period_end, bsp
+  `, [bsp]);
+  const regeneratedMeasurements = [];
+  for (const draft of drafts.rows) {
+    const regenerated = await client.query(`
+      select medicao.generate_draft($1, $2::date, $3::date, $4, $5::char(3)) as id
+    `, [draft.bsp, draft.period_start, draft.period_end, draft.project_key, draft.currency]);
+    regeneratedMeasurements.push(regenerated.rows[0].id);
+  }
+
   await client.query('commit');
-  console.log(JSON.stringify({ ok: true, rate_source_id: sourceId, imported_rules: rows.length }));
+  console.log(JSON.stringify({
+    ok: true,
+    rate_source_id: sourceId,
+    imported_rules: rows.length,
+    regenerated_measurements: regeneratedMeasurements,
+  }));
 } catch (error) {
   await client.query('rollback').catch(() => undefined);
   throw error;
