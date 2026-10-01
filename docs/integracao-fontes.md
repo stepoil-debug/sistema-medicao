@@ -31,7 +31,17 @@ Essa regra evita duplicidade entre RDO e Timesheet e mantém o BM rastreável.
 
 Os dados são copiados para tabelas de snapshot no schema `medicao`. A aplicação de medição não atualiza RDO nem Timesheet. O schema interno possui RLS e não é acessível pelo browser; o acesso deve ocorrer por backend com credencial privada.
 
+## Snapshot semanal do Timesheet
+
+Além das linhas normalizadas de tarefa, a medição mantém uma cópia estrutural em:
+
+- `medicao.source_timesheet_periods`: colaborador, função, campanha, unidade, BSP, semana, versão, status e aprovação;
+- `medicao.source_timesheet_days`: dia, status, horas esperadas, normais, extras, noturnas, total, autorização de H.E. e pendências de validação.
+
+O backend deve executar, na mesma rotina de sincronização, `medicao.sync_sources(data_inicial, data_final, bsp)` e depois `medicao.sync_timesheet_structure(data_inicial, data_final, bsp)`. A segunda função é idempotente e atualiza apenas a cópia do schema `medicao`.
+
+Esse desenho reproduz o fluxo observado na referência: o usuário pode revisar a cópia do BM sem alterar o documento operacional original, e a medição continua rastreável até a semana, dia e linha que originaram o valor.
+
 ## Situação encontrada na primeira sincronização
 
 No ambiente validado havia 18 RDOs, dos quais 16 concluídos e 70 apontamentos individuais associados a RDO concluído. O conjunto `offshore_ts` estava sem registros. Por isso os primeiros BMs foram gerados a partir do fallback do RDO, com alerta de fonte não confirmada.
-

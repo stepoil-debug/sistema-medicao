@@ -379,6 +379,26 @@
         </div>
       </div>
 
+      <div style="background: #fff; border: 1px solid #E8EEF6; border-radius: 18px; overflow: hidden;">
+        <div style="display: flex; align-items: flex-start; gap: 16px; padding: 16px 20px 13px; border-bottom: 1px solid #EDF2F8;">
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">Fonte operacional</div>
+            <div style="font-size: 17px; font-weight: 700; color: #0B2340; margin-top: 4px;">Dados que alimentam este BM</div>
+          </div>
+          <div style="font-size: 11px; color: #5B7185; padding-top: 4px;">Snapshot da medição · BSP {{ bm.n }}</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 1px; background: #EDF2F8;">
+          <sc-for list="{{ bm.fonte.cards }}" as="f" hint-placeholder-count="4">
+          <div style="background: #fff; padding: 14px 18px; min-width: 0;">
+            <div style="font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #93A6B8;">{{ f.k }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: {{ f.cor }}; margin-top: 5px; overflow-wrap: anywhere;">{{ f.v }}</div>
+            <div style="font-size: 11px; color: #5B7185; margin-top: 4px; line-height: 1.35;">{{ f.sub }}</div>
+          </div>
+          </sc-for>
+        </div>
+        <div style="padding: 11px 18px; background: #F7FAFD; font-size: 12px; color: #5B7185; line-height: 1.45;">{{ bm.fonte.note }}</div>
+      </div>
+
       <div style="background: #fff; border: 1px solid #E8EEF6; border-radius: 18px; padding: 16px 22px; display: flex; align-items: center; gap: 0;">
         <sc-for list="{{ bm.etapas }}" as="e" hint-placeholder-count="5">
         <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
@@ -834,6 +854,19 @@ function liveBspRows(summary, lines, peopleRows) {
   });
   return summary.map(row => {
     const rowLines = byMeasurement.get(row.id) || [];
+    const sourceSystems = Array.from(new Set(rowLines.map(line => line.source_system).filter(Boolean)));
+    const sourceDates = Array.from(new Set(rowLines.map(line => String(line.service_date || '').slice(0, 10)).filter(Boolean)));
+    const sourceEmployees = new Set(rowLines.map(line => line.employee_name).filter(Boolean)).size;
+    const sourceSummary = {
+      days: sourceDates.length,
+      employees: sourceEmployees,
+      timesheetLines: rowLines.filter(line => line.source_system === 'offshore_ts').length,
+      rdoLines: rowLines.filter(line => line.source_system === 'offshore_rdo').length,
+      normalHours: rowLines.filter(line => line.category === 'normal_hours').reduce((sum, line) => sum + Number(line.quantity || 0), 0),
+      overtimeHours: rowLines.filter(line => line.category === 'overtime_hours').reduce((sum, line) => sum + Number(line.quantity || 0), 0),
+      nightHours: rowLines.filter(line => line.category === 'night_hours').reduce((sum, line) => sum + Number(line.quantity || 0), 0),
+      sourceLabel: sourceSystems.length > 1 ? 'Timesheet + RDO' : (sourceSystems[0] === 'offshore_ts' ? 'Timesheet Offshore' : (sourceSystems[0] === 'offshore_rdo' ? 'RDO concluído' : 'Sem fonte'))
+    };
     const horas = rowLines.map(line => {
       const dayIndex = liveDayIndex(line.service_date);
       return [
@@ -871,7 +904,8 @@ function liveBspRows(summary, lines, peopleRows) {
       liveLines: Number(row.line_count || 0),
       liveErrors: Number(row.error_count || 0),
       liveWarnings: Number(row.warning_count || 0),
-      liveSource: row.source_mode || 'Sem fonte'
+      liveSource: row.source_mode || sourceSummary.sourceLabel,
+      sourceSummary
     };
   });
 }
@@ -1150,6 +1184,16 @@ class Component extends DCLogic {
       usoTexto: !cur.poVal ? 'Cadastre o valor da PO para acompanhar o saldo do contrato.' : (excede ? 'Este boletim excede a PO em ' + brl(-cur.saldo) + '. Solicite aditivo antes de enviar ao cliente.' : Math.round((cur.emit + cur.atual) / cur.poVal * 100) + '% da PO consumida após este boletim.'),
       usoCor: !cur.poVal ? '#A45F00' : (excede ? '#D93B3B' : '#5B7185'),
       pessoas: cur.pessoas, horas: cur.horas, logistica: cur.logistica, rentals: cur.rentals, consumiveis: cur.consumiveis,
+      fonte: (() => {
+        const source = cur.sourceSummary || { days: 0, employees: cur.pessoas.length, timesheetLines: 0, rdoLines: 0, normalHours: 0, overtimeHours: 0, nightHours: 0, sourceLabel: cur.liveSource || 'Sem fonte' };
+        const sourceCards = [
+          { k: 'Fonte principal', v: source.sourceLabel, sub: source.timesheetLines > 0 ? 'linhas do Timesheet' : (source.rdoLines > 0 ? 'fallback de RDO' : 'aguardando sincronização'), cor: source.sourceLabel === 'Sem fonte' ? '#A45F00' : '#0B2340' },
+          { k: 'Pessoas / dias', v: String(source.employees) + ' / ' + String(source.days), sub: 'pessoas identificadas e dias com lançamento', cor: '#0B2340' },
+          { k: 'Horas normais', v: Number(source.normalHours || 0).toFixed(2) + ' h', sub: 'categoria normal_hours', cor: '#0B2340' },
+          { k: 'H.E. / noturno', v: Number(source.overtimeHours || 0).toFixed(2) + ' h / ' + Number(source.nightHours || 0).toFixed(2) + ' h', sub: 'apontamentos elegíveis para rate', cor: '#0B2340' }
+        ];
+        return { cards: sourceCards, note: source.timesheetLines > 0 ? 'Cópia independente do Timesheet: ajustes feitos no BM não retornam para a fonte.' : (source.rdoLines > 0 ? 'O BM está usando RDO concluído porque não há Timesheet aprovado para este período/BSP.' : 'Sincronize as fontes e gere um rascunho para carregar os apontamentos.') };
+      })(),
       secTotal: s.secao === 'resumo' ? cur.atualLabel : (cur.liveErrors > 0 && ['diarias', 'horas'].includes(s.secao) ? 'Pendente de rate' : brl(cur.vals[s.secao] || 0))
     };
 
