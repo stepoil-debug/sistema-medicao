@@ -365,7 +365,7 @@
             <div style="font-size: 13px; color: #5B7185; margin-top: 5px;">BSP {{ bm.n }} · {{ bm.cliente }} · {{ bm.unidade }} · período {{ bm.periodo }}</div>
           </div>
           <div style="display: flex; gap: 9px; align-items: center;">
-            <button style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Pré-visualizar PDF</button>
+            <button onClick="{{ bm.irRates }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">{{ bm.rateAction }}</button>
             <button onClick="{{ avancar }}" style="height: 38px; padding: 0 17px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">{{ bm.acao }}</button>
           </div>
         </div>
@@ -610,6 +610,43 @@
   </div>
   </sc-if>
 
+  <sc-if value="{{ isRates }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background: #fff; border-bottom: 1px solid #EDF2F8; padding: 22px 26px 20px; display: flex; align-items: flex-start; gap: 20px;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">BSP {{ rate.n }} · BM {{ rate.bm }}</div>
+        <div style="font-size: 27px; font-weight: 700; letter-spacing: -.025em; color: #0B2340; margin: 6px 0 5px;">Conferência de rates</div>
+        <div style="font-size: 13px; color: #5B7185;">{{ rate.cliente }} · {{ rate.unidade }} · período {{ rate.periodo }}</div>
+      </div>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ rate.back }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">← Voltar ao boletim</button>
+    </div>
+
+    <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="background: {{ rate.catalogFound ? '#EFF8F3' : '#FFF7EC' }}; border: 1px solid {{ rate.catalogFound ? '#CFEBDD' : '#FFE3BF' }}; border-radius: 16px; padding: 16px 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: {{ rate.catalogFound ? '#1B7A55' : '#A45F00' }};">{{ rate.catalogFound ? 'Cadastro localizado para este cliente' : 'Nenhum cadastro localizado para este cliente' }}</div>
+        <div style="font-size: 12px; color: #5B7185; margin-top: 5px;">{{ rate.catalogFound ? 'Confira as funções e valores encontrados. Edite qualquer campo antes de confirmar.' : 'Cadastre os valores por função agora. Depois de confirmar, eles ficarão disponíveis para os próximos boletins desta BSP.' }}</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5B7185; margin-top: 7px;">{{ rate.source }}</div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid #E8EEF6; border-radius: 18px; overflow: hidden;">
+        <div style="display: grid; grid-template-columns: minmax(260px,1.5fr) repeat(4, minmax(150px,1fr)); gap: 1px; padding: 13px 16px; background: #F7FAFD; border-bottom: 1px solid #EDF2F8; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B7C8F;"><div>Função localizada</div><div>Diária</div><div>Hora normal</div><div>Hora extra</div><div>Noturno</div></div>
+        <sc-for list="{{ rate.rows }}" as="r" hint-placeholder-count="8">
+        <div style="display: grid; grid-template-columns: minmax(260px,1.5fr) repeat(4, minmax(150px,1fr)); gap: 1px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F1F5F9;">
+          <div><div style="font-size: 13px; font-weight: 600; color: #0B2340;">{{ r.funcao }}</div><div style="font-size: 11px; color: #93A6B8; margin-top: 3px;">Confirme ou corrija antes de gerar o BM</div></div>
+          <input type="number" min="0" step="0.01" value="{{ r.daily }}" onInput="{{ r.dailyInput }}" placeholder="R$" style="height: 36px; width: 100%; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #fff;">
+          <input type="number" min="0" step="0.01" value="{{ r.normal }}" onInput="{{ r.normalInput }}" placeholder="R$" style="height: 36px; width: 100%; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #fff;">
+          <input type="number" min="0" step="0.01" value="{{ r.overtime }}" onInput="{{ r.overtimeInput }}" placeholder="R$" style="height: 36px; width: 100%; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #fff;">
+          <input type="number" min="0" step="0.01" value="{{ r.night }}" onInput="{{ r.nightInput }}" placeholder="R$" style="height: 36px; width: 100%; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #fff;">
+        </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 14px;"><div style="flex: 1; font-size: 12px; line-height: 1.5; color: #D93B3B;">{{ rate.error }}</div><button onClick="{{ rate.back }}" style="height: 40px; padding: 0 17px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;">Cancelar</button><button onClick="{{ rate.confirm }}" style="height: 40px; padding: 0 20px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);">{{ rate.saving ? 'Salvando e recalculando…' : 'Confirmar rates e recalcular BM →' }}</button></div>
+    </div>
+  </div>
+  </sc-if>
+
   </div>
 
   <div style="flex: none; display: flex; align-items: center; gap: 16px; padding: 8px 26px; background: #F1F5F9; border-top: 1px solid #EDF2F8; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F;">
@@ -697,16 +734,19 @@ function tc(s) { return s.toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + 
 function ini(n) { const p = n.split(' ').filter(Boolean); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 function seq(spec) { const a = Array(31).fill(''); spec.forEach(([c, f, t]) => { for (let i = f; i <= (t == null ? f : t); i++) a[i] = c; }); return a; }
 function numKey(n) { return n.split('-').map(x => x.padStart(5, '0')).join('-'); }
+function normRateText(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+}
 
 function pessoa(p, bsp) {
-  const [nome, funcao, rate, spec, liveOnboard] = p;
+  const [nome, funcao, rate, spec, liveOnboard, detalhe] = p;
   const cod = seq(spec);
   const emb = cod.filter(c => c === 'E' || c === 'P').length;
   const dob = cod.filter(c => c === 'DO').length;
   const can = cod.filter(c => c === 'EC' || c === 'MEC').length;
   const total = emb * rate + dob * rate * 2 + can * rate * 0.5;
   return {
-    nome: tc(nome), ini: ini(nome), funcao, bsp, rate: brl(rate), emb: String(emb), dob: String(dob), can: String(can),
+    nome: tc(nome), ini: ini(nome), funcao: detalhe || funcao, funcaoBase: funcao, bsp, rate: brl(rate), emb: String(emb), dob: String(dob), can: String(can),
     embN: emb, dobN: dob, totalN: total, total: brl(total),
     onboard: liveOnboard == null ? ['E', 'P', 'DO'].indexOf(cod[30]) > -1 : liveOnboard,
     cells: cod.map((c, i) => c ? { t: c, bg: CODES[c].bg, fg: CODES[c].fg, col: DIAS[i].col, mini: CODES[c].mini } : { t: '', bg: 'transparent', fg: 'transparent', col: DIAS[i].col, mini: '#EEF3F9' })
@@ -782,7 +822,7 @@ function livePeopleRows(row, peopleRows, lineRows) {
     const normal = group.rows.reduce((total, item) => total + Number(item.normal_hours || 0), 0);
     const overtime = group.rows.reduce((total, item) => total + Number(item.overtime_hours || 0), 0);
     const detail = group.func + ' · ' + normal + 'h normais · ' + overtime + 'h extras';
-    return [group.name, detail, dailyRates.get(group.name + '|' + group.func) || 0, spec, true];
+    return [group.name, group.func, dailyRates.get(group.name + '|' + group.func) || 0, spec, true, detail];
   });
 }
 
@@ -808,8 +848,12 @@ function liveBspRows(summary, lines, peopleRows) {
     });
     const people = livePeopleRows(row, peopleRows || [], rowLines);
     return {
+      id: row.id,
       n: row.bsp || 'Sem BSP',
       bm: String(row.version || 1).padStart(3, '0'),
+      clientName: row.client_name || row.project_name || row.bsp || 'Cliente não informado',
+      projectKey: row.project_key || null,
+      currency: row.currency || 'BRL',
       cli: [row.client_name, row.project_name].filter(Boolean).join(' · ') || row.project_key || 'Projeto sem cadastro',
       un: row.location || 'Operação offshore',
       po: 'não informada',
@@ -833,10 +877,26 @@ function liveBspRows(summary, lines, peopleRows) {
 }
 
 class Component extends DCLogic {
-  state = { tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, liveError: '' };
+  state = { tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, liveError: '', rateCatalog: [], rateError: '', rateDraft: {}, rateSaving: false };
 
   componentDidMount() {
     this.loadLiveData();
+    this.loadRateCatalog();
+  }
+
+  async loadRateCatalog() {
+    const config = window.MEDICAO_CONFIG;
+    if (!config || !config.supabaseUrl || !config.publishableKey) return;
+    const headers = { apikey: config.publishableKey, Authorization: 'Bearer ' + config.publishableKey };
+    try {
+      const base = config.supabaseUrl.replace(/\/$/, '') + '/rest/v1/';
+      const response = await fetch(base + 'medicao_rate_catalog?select=*&order=confirmed_at.desc', { headers });
+      if (!response.ok) throw new Error('Cadastro de rates HTTP ' + response.status);
+      this.setState({ rateCatalog: await response.json(), rateError: '' });
+    } catch (error) {
+      this.setState({ rateError: error instanceof Error ? error.message : String(error) });
+      console.error('[medicao] falha ao carregar cadastro de rates', error);
+    }
   }
 
   async loadLiveData() {
@@ -867,7 +927,10 @@ class Component extends DCLogic {
         people = await peopleResponse.json();
       }
       const live = liveBspRows(summary, lines, people);
-      if (live.length) this.setState({ liveBsps: live, bsp: live[0].n, novoBsp: live[0].n, liveError: '' });
+      if (live.length) {
+        const selectedBsp = live.some(row => row.n === this.state.bsp) ? this.state.bsp : live[0].n;
+        this.setState({ liveBsps: live, bsp: selectedBsp, novoBsp: this.state.novoBsp || selectedBsp, liveError: '' });
+      }
     } catch (error) {
       this.setState({ liveError: error instanceof Error ? error.message : String(error) });
       console.error('[medicao] falha ao carregar dados reais', error);
@@ -944,6 +1007,81 @@ class Component extends DCLogic {
     const idx = FLUXO.indexOf(cur.st);
     const tot = cur.poVal ? Math.max(cur.poVal, cur.emit + cur.atual) : 1;
     const excede = cur.saldo != null && cur.saldo < 0;
+    const currentClientName = cur.clientName || cur.cli || 'Cliente não informado';
+    const currentClientKey = normRateText(currentClientName.split(' · ')[0]);
+    const catalogRows = (s.rateCatalog || []).filter(row =>
+      normRateText(row.client_name) === currentClientKey &&
+      (!row.bsp || normRateText(row.bsp) === normRateText(cur.n))
+    );
+    const catalogRate = (funcao, category) => {
+      const found = catalogRows.find(row => normRateText(row.employee_function) === normRateText(funcao) && row.category === category);
+      return found ? String(found.rate) : '';
+    };
+    const rateDraftValue = (funcao, category) => {
+      const key = normRateText(funcao) + '|' + category;
+      return Object.prototype.hasOwnProperty.call(s.rateDraft || {}, key) ? s.rateDraft[key] : catalogRate(funcao, category);
+    };
+    const onRateInput = (funcao, category) => e => this.setState(st => ({
+      rateDraft: Object.assign({}, st.rateDraft, { [normRateText(funcao) + '|' + category]: e.target.value })
+    }));
+    const rateFunctions = Array.from(new Map(cur.pessoas.map(person => [normRateText(person.funcaoBase || person.funcao), person.funcaoBase || person.funcao])).entries())
+      .filter(entry => entry[0])
+      .map(entry => entry[1]);
+    const rateRows = rateFunctions.map(funcao => ({
+      funcao,
+      daily: rateDraftValue(funcao, 'daily'), normal: rateDraftValue(funcao, 'normal_hours'),
+      overtime: rateDraftValue(funcao, 'overtime_hours'), night: rateDraftValue(funcao, 'night_hours'),
+      dailyInput: onRateInput(funcao, 'daily'), normalInput: onRateInput(funcao, 'normal_hours'),
+      overtimeInput: onRateInput(funcao, 'overtime_hours'), nightInput: onRateInput(funcao, 'night_hours')
+    }));
+    const rateInputNumber = value => {
+      const parsed = Number(String(value ?? '').trim().replace(',', '.'));
+      return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+    };
+    const confirmRates = async () => {
+      const rows = [];
+      rateRows.forEach(row => {
+        [['daily', row.daily, 'day'], ['normal_hours', row.normal, 'hour'], ['overtime_hours', row.overtime, 'hour'], ['night_hours', row.night, 'hour']]
+          .forEach(([category, value, unit]) => {
+            if (String(value ?? '').trim() !== '') {
+              const rate = rateInputNumber(value);
+              if (rate != null) rows.push({ category, employee_function: row.funcao, unit, rate });
+            }
+          });
+      });
+      if (!rows.length) {
+        this.setState({ rateError: 'Informe pelo menos um rate antes de confirmar.' });
+        return;
+      }
+      const config = window.MEDICAO_CONFIG;
+      if (!config || !cur.id) {
+        this.setState({ rateError: 'A medição real não está disponível para confirmação.' });
+        return;
+      }
+      this.setState({ rateSaving: true, rateError: '' });
+      try {
+        const base = config.supabaseUrl.replace(/\/$/, '') + '/rest/v1/rpc/medicao_confirm_rate_catalog';
+        const response = await fetch(base, {
+          method: 'POST',
+          headers: { apikey: config.publishableKey, Authorization: 'Bearer ' + config.publishableKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            p_measurement_id: cur.id,
+            p_client_name: currentClientName.split(' · ')[0],
+            p_bsp: cur.n,
+            p_project_key: cur.projectKey || null,
+            p_currency: cur.currency || 'BRL',
+            p_rows: rows,
+            p_proposal_code: catalogRows[0] && catalogRows[0].proposal_code ? catalogRows[0].proposal_code : null,
+            p_file_name: catalogRows[0] && catalogRows[0].file_name ? catalogRows[0].file_name : 'Cadastro de rates por cliente'
+          })
+        });
+        if (!response.ok) throw new Error('Confirmação de rates HTTP ' + response.status + ': ' + await response.text());
+        this.setState({ rateSaving: false, rateError: '', rateDraft: {}, tela: 'bm' });
+        await this.loadLiveData();
+      } catch (error) {
+        this.setState({ rateSaving: false, rateError: error instanceof Error ? error.message : String(error) });
+      }
+    };
     const valorSec = id => id === 'resumo' ? cur.atual : cur.vals[id];
     const secoes = SECOES.map(x => {
       const on = s.secao === x.id, v = valorSec(x.id);
@@ -979,6 +1117,8 @@ class Component extends DCLogic {
       crumb: 'Medição / BSP ' + cur.n + ' / BM ' + cur.bm, periodo: cur.periodo,
       irPainel: () => this.setState({ tela: 'painel' }),
       irEmb: () => this.setState({ tela: 'emb', filtro: cur.n }),
+      irRates: () => this.setState({ tela: 'rates', bsp: cur.n, secao: 'resumo', rateError: '' }),
+      rateAction: cur.liveErrors > 0 ? 'Cadastrar / confirmar rates' : 'Editar cadastro de rates',
       acao: ACAO[idx],
       faixa: [
         { k: 'PO', v: cur.po, cor: cur.poVal ? '#24374B' : '#A45F00' },
@@ -1011,6 +1151,14 @@ class Component extends DCLogic {
       usoCor: !cur.poVal ? '#A45F00' : (excede ? '#D93B3B' : '#5B7185'),
       pessoas: cur.pessoas, horas: cur.horas, logistica: cur.logistica, rentals: cur.rentals, consumiveis: cur.consumiveis,
       secTotal: s.secao === 'resumo' ? cur.atualLabel : (cur.liveErrors > 0 && ['diarias', 'horas'].includes(s.secao) ? 'Pendente de rate' : brl(cur.vals[s.secao] || 0))
+    };
+
+    const rate = {
+      n: cur.n, cliente: currentClientName.split(' · ')[0], unidade: cur.un, bm: cur.bm,
+      periodo: cur.periodo, catalogFound: catalogRows.length > 0,
+      source: catalogRows[0] ? [catalogRows[0].proposal_code, catalogRows[0].file_name].filter(Boolean).join(' · ') : 'Nenhum cadastro localizado; informe os valores abaixo.',
+      rows: rateRows, saving: s.rateSaving, error: s.rateError,
+      back: () => this.setState({ tela: 'bm', bsp: cur.n, secao: 'resumo' }), confirm: confirmRates
     };
 
 
@@ -1064,7 +1212,7 @@ class Component extends DCLogic {
 
     const periodoAtual = all[0] && all[0].periodo ? all[0].periodo : '26/08 – 25/09/2026';
     return {
-      tabs, novo, isNovo: s.tela === 'novo', irNovo: go('novo'), isPainel: s.tela === 'painel', isEmb: s.tela === 'emb', isBM: s.tela === 'bm',
+      tabs, novo, rate, isNovo: s.tela === 'novo', isRates: s.tela === 'rates', irNovo: go('novo'), isPainel: s.tela === 'painel', isEmb: s.tela === 'emb', isBM: s.tela === 'bm',
       kpis, bsps, qtdBsp: String(all.length), agenda, alertas,
       irEmbarques: go('emb'), irPainel: go('painel'),
       dias: DIAS, linhas, embKpis, filtros, legenda,
