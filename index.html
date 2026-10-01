@@ -74,6 +74,23 @@
 
   <sc-if value="{{ isReferenceModule }}" hint-placeholder-val="{{ false }}">
   <div>
+    <sc-if value="{{ module.isScreenHeader }}" hint-placeholder-val="{{ false }}">
+    <div style="background: #F4F8FB; padding: 24px 22px 0;">
+      <div style="display: flex; align-items: flex-start; gap: 20px; padding: 0 2px 16px;">
+        <div style="min-width: 0;"><div style="font-size: 25px; font-weight: 700; letter-spacing: -.025em; color: #0B2340;">{{ module.titulo }}</div><div style="font-size: 13px; color: #5B7185; margin-top: 4px;">{{ module.subtitulo }}</div></div>
+        <div style="flex: 1;"></div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <sc-if value="{{ module.canImport }}" hint-placeholder-val="{{ false }}"><button onClick="{{ module.importAction }}" style="height: 38px; padding: 0 15px; display: flex; align-items: center; gap: 8px; border: 1px solid #D5E2EF; border-radius: 10px; background: #fff; color: #0B2340; font-size: 12px; cursor: pointer; white-space: nowrap;"><span style="font-size: 15px;">↥</span>{{ module.importLabel }}</button></sc-if>
+          <sc-if value="{{ module.canCreate }}" hint-placeholder-val="{{ false }}"><button onClick="{{ module.openNew }}" style="height: 38px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; background: #173E78; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 5px 12px rgba(23,62,120,.18);">＋ {{ module.newLabel }}</button></sc-if>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; width: fit-content; max-width: 100%; padding: 4px; border-radius: 11px; background: #DCECF8; overflow-x: auto;"><sc-for list="{{ module.screenTabs }}" as="tab" hint-placeholder-count="5"><button onClick="{{ tab.click }}" style="{{ tab.style }}">{{ tab.nome }}</button></sc-for></div>
+    </div>
+    <sc-if value="{{ module.hasScreenFilters }}" hint-placeholder-val="{{ false }}">
+      <div style="margin: 0 22px; padding: 14px 13px 13px; display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid #D5E2EF; border-top: 0; border-radius: 0 0 14px 14px; box-shadow: 0 2px 5px rgba(11,35,64,.04);"><sc-for list="{{ module.screenFilters }}" as="filter" hint-placeholder-count="6"><label style="display: flex; flex-direction: column; gap: 5px; min-width: {{ filter.width }};"><span style="font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #7E93A8;">{{ filter.label }}</span><sc-if value="{{ filter.isSelect }}" hint-placeholder-val="{{ false }}"><select style="height: 33px; width: 100%; padding: 0 9px; border: 1px solid #D5E2EF; border-radius: 8px; background: #fff; color: #2C3E50; font-size: 12px;"><option>{{ filter.placeholder }}</option></select></sc-if><sc-if value="{{ filter.isText }}" hint-placeholder-val="{{ true }}"><input type="{{ filter.type }}" placeholder="{{ filter.placeholder }}" style="height: 33px; width: 100%; padding: 0 10px; border: 1px solid #D5E2EF; border-radius: 8px; background: #fff; color: #2C3E50; font-size: 12px;"></sc-if></label></sc-for><div style="flex: 1; min-width: 15px;"></div><div style="height: 33px; padding: 0 11px; display: flex; align-items: center; gap: 7px; border-radius: 8px; background: #EAF4FB; color: #526B84; font-size: 11px; white-space: nowrap;">↻ Última atualização <b>{{ module.updatedAt }}</b></div><button onClick="{{ module.exportAction }}" style="height: 33px; padding: 0 12px; border: 1px solid #D5E2EF; border-radius: 8px; background: #fff; color: #0B2340; font-size: 11px; cursor: pointer; white-space: nowrap;">⇩ Exportar relatório</button></div>
+    </sc-if>
+    </sc-if>
+    <sc-if value="{{ module.isStandardHeader }}" hint-placeholder-val="{{ true }}">
     <div style="background: #fff; border-bottom: 1px solid #EDF2F8; padding: 22px 26px 20px; display: flex; align-items: flex-start; gap: 20px;">
       <div>
         <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">STEP · Operação integrada</div>
@@ -88,8 +105,10 @@
         <button onClick="{{ module.refresh }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;">Atualizar dados</button>
       </div>
     </div>
+    </sc-if>
 
     <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <sc-if value="{{ module.showKpis }}" hint-placeholder-val="{{ true }}">
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px;">
         <sc-for list="{{ module.kpis }}" as="k" hint-placeholder-count="4">
           <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 16px; padding: 16px 18px;">
@@ -99,12 +118,15 @@
           </div>
         </sc-for>
       </div>
+      </sc-if>
 
+      <sc-if value="{{ module.showChipFilters }}" hint-placeholder-val="{{ true }}">
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <sc-for list="{{ module.filters }}" as="f" hint-placeholder-count="6">
           <button onClick="{{ f.click }}" style="{{ f.style }}">{{ f.nome }}</button>
         </sc-for>
       </div>
+      </sc-if>
 
       <sc-if value="{{ module.isNewForm }}" hint-placeholder-val="{{ false }}">
         <div style="background: #fff; border: 1px solid #CFE0F3; border-radius: 18px; padding: 18px; box-shadow: 0 8px 22px rgba(14,74,168,.08);">
@@ -1519,16 +1541,26 @@ class Component extends DCLogic {
       costs: { label: 'Novo custo', title: 'Novo lançamento de custo', fields: [['tipo', 'Tipo de custo', 'text', 'Hospedagem / transporte / passagem'], ['cliente', 'Cliente', 'text', 'Cliente'], ['bsp', 'BSP', 'text', '25-701'], ['data', 'Data', 'date', ''], ['valor', 'Valor', 'number', '0,00'], ['observacao', 'Observação', 'text', 'Detalhamento do custo']] },
       'rates-catalog': { label: 'Novo rate', title: 'Novo rate por cliente e função', fields: [['cliente', 'Cliente', 'text', 'Cliente'], ['unidade', 'Unidade / embarcação', 'text', 'Unidade'], ['bsp', 'BSP', 'text', '25-701'], ['funcao', 'Função', 'text', 'Função comercial'], ['diaria', 'Diária', 'number', '0,00'], ['extra', 'Hora extra', 'number', '0,00'], ['noturno', 'Adicional noturno', 'number', '0,00']] }
     };
+    const screenConfigs = {
+      nominations: { tabs: [['nomeacoes', 'Nomeações'], ['equipes', 'Equipes Embarcadas'], ['mapa', '▦  Mapa'], ['simulacao', 'Simulação'], ['aptidao', '♧  Aptidão']], filters: [['busca', 'Busca', 'text', 'Buscar função, solicitante, BSP...', '280px'], ['status', 'Status', 'text', 'Todos os status', '230px']], canImport: false, updatedAt: '29/09/2026, 17:23 · Bruna' },
+      transport: { tabs: [['solicitacao', 'Solicitação de Transporte'], ['kanban', 'Kanban'], ['programado', 'Programado'], ['quadro', 'Quadro Detalhado'], ['timeline', 'Linha do Tempo'], ['dashboard', 'Dashboard KPI'], ['custos', 'Custos']], filters: [], canImport: true, importLabel: 'Importar planilha de custos', updatedAt: '01/10/2026, 16:40 · Gustavo' },
+      hospedagem: { tabs: [['lancamentos', 'Lançamentos'], ['consolidado', 'Consolidado'], ['hoteis', 'Hotéis']], filters: [['de', 'Período - de', 'date', '', '143px'], ['ate', 'Período - até', 'date', '', '143px'], ['unidade', 'Unidade', 'text', 'Todas', '175px'], ['bsp', 'BSP', 'text', 'Todos', '160px'], ['hotel', 'Hotel', 'text', 'Todos', '190px'], ['motivo', 'Motivo', 'text', 'Todos', '160px'], ['usuario', 'Nome do usuário', 'text', 'Buscar por nome...', '210px']], canImport: true, importLabel: 'Importar planilha de custos', updatedAt: '01/10/2026, 16:40 · Gustavo' },
+      passagens: { tabs: [['solicitacoes', 'Solicitações'], ['consolidado', 'Consolidado'], ['relatorio', 'Relatório de Viagens']], filters: [['unidade', 'Unidade', 'text', 'Todas', '175px'], ['bsp', 'BSP', 'text', 'Todos', '160px'], ['motivo', 'Motivo', 'text', 'Todos', '160px'], ['status', 'Status', 'text', 'Todos', '145px'], ['usuario', 'Nome do usuário', 'text', 'Buscar por nome...', '210px']], canImport: true, importLabel: 'Importar planilha de custos', updatedAt: '01/10/2026, 16:40 · Gustavo' },
+      reembolsos: { tabs: [['relatorios', 'Relatórios de Reembolsos'], ['notas', 'Notas de Débitos']], filters: [['unidade', 'Unidade', 'text', 'Todas', '175px'], ['bsp', 'BSP', 'text', 'Todos', '160px'], ['status', 'Status', 'text', 'Todos', '175px'], ['colaborador', 'Colaborador', 'text', 'Buscar por nome...', '210px'], ['de', 'Período - de', 'date', '', '143px'], ['ate', 'Período - até', 'date', '', '143px']], canImport: false, updatedAt: '01/10/2026, 16:40 · Gustavo' },
+      costs: { tabs: [['dashboard', 'Dashboard'], ['consolidada', 'Visão Consolidada']], filters: [['de', 'Período - de', 'date', '', '143px'], ['ate', 'Período - até', 'date', '', '143px']], canImport: false, updatedAt: '01/10/2026, 16:40 · Gustavo', showKpis: true, kpis: [{ k: 'Custo total', v: 'R$ 0,00', sub: 'fontes aguardando integração' }, { k: 'Hospedagem', v: 'R$ 0,00', sub: '0% do total' }, { k: 'Transporte', v: 'R$ 0,00', sub: '0% do total' }, { k: 'Passagens aéreas', v: 'R$ 0,00', sub: '0% do total' }] },
+      'rates-catalog': { tabs: [], filters: [['cliente', 'Cliente', 'text', 'Todos', '225px'], ['unidade', 'Unidade', 'text', 'Todas', '225px'], ['bsp', 'BSP', 'text', 'Todos', '160px']], canImport: true, importLabel: 'Importar planilha', updatedAt: '01/10/2026, 16:40 · Gustavo' },
+      reports: { tabs: [], filters: [['de', 'De', 'date', '', '175px'], ['ate', 'Até', 'date', '', '175px']], canImport: false, updatedAt: 'Período usado por todos os relatórios' }
+    };
     const referenceModules = {
       histograma: { titulo: 'Histograma Offshore', subtitulo: 'Visão consolidada de presença, headcount e ocupação por BSP e por dia.', isHistogram: true, histogramBsp, histogramDays, histogramDaysLabel, histogramNote: 'O Histograma consolida a presença operacional. Para conferir cada lançamento, abra a visão detalhada do Timesheet.', openTimesheet: () => this.setState({ modulo: 'timesheet', tela: 'painel', moduleFilter: s.moduleFilter }), isTable: false },
       timesheet: { titulo: 'Timesheet Offshore', subtitulo: 'Lançamentos detalhados por pessoa, função, BSP e data, com horas normais e extras.', isTable: true, grid: '1.6fr 1.15fr .9fr .85fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Data', 'Horas normais', 'H.E.', 'Fonte'], rows: timesheetRows, tableNote: s.sourcePeople.length ? 'Cada linha representa um lançamento sincronizado do período. O Timesheet é a fonte detalhada usada para conferência.' : 'Nenhum Timesheet semanal foi localizado; os registros exibidos vêm do RDO concluído como fallback.' },
       collaborators: { titulo: 'Colaboradores', subtitulo: 'Cadastro central usado no Histograma, Timesheet, Rates e Medição.', isTable: true, grid: '1.8fr 1.2fr 1fr .8fr .8fr', columns: ['Nome', 'Função', 'BSP principal', 'Dias', 'Status'], rows: peopleCatalog.map(row => ({ cells: [row.name, row.func, row.bsp, row.dateLabel, 'Ativo'] })), tableNote: 'A consolidação usa o nome e a função informados pelas fontes operacionais.' },
       'rates-catalog': { titulo: 'Rates', subtitulo: 'Cadastro por cliente, unidade, BSP e função usado pelo cálculo automático do BM.', isTable: true, grid: '1.4fr 1fr 1fr 1fr 1fr 1fr', columns: ['Função', 'BSP', 'Diária', 'Hora extra', 'Noturno', 'Status'], rows: (s.rateCatalog || []).filter(row => !s.moduleFilter || s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).map(row => ({ cells: [row.employee_function, row.bsp || 'Todos', row.category === 'daily' ? brl(row.rate) : '—', row.category === 'overtime_hours' ? brl(row.rate) : '—', row.category === 'night_hours' ? brl(row.rate) : '—', 'Confirmado'] })), tableNote: s.rateCatalog && s.rateCatalog.length ? 'Confira os valores localizados e confirme qualquer alteração no BM antes de avançar.' : 'Nenhum rate confirmado ainda. Abra um BM, informe os valores da Commercial offer e confirme por cliente/função.' },
-      costs: { titulo: 'Custos', subtitulo: 'Visão consolidada de hospedagem, transporte, passagens e demais custos.', isTable: true, grid: '1.4fr 1fr 1fr 1fr', columns: ['Tipo de custo', 'Registros', 'Total', 'Status'], rows: ['Hospedagem', 'Transporte', 'Passagens aéreas', 'Reembolsos'].map(name => ({ cells: [name, '0', brl(0), 'Aguardando integração'] })), tableNote: 'As fontes de custo ainda não estão conectadas ao schema de medição.' },
-      transport: { titulo: 'Transporte', subtitulo: 'Solicitações e viagens de mobilização/desmobilização vinculadas à BSP.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Solicitante', 'Data', 'Origem / destino', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de transporte foi sincronizado para o período.' },
-      hospedagem: { titulo: 'Hospedagem', subtitulo: 'Reservas e diárias de hotel pré-embarque vinculadas ao colaborador.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Entrada', 'Saída', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de hospedagem foi sincronizado para o período.' },
-      passagens: { titulo: 'Passagens Aéreas', subtitulo: 'Controle de reservas, trechos e custos de deslocamento.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Passageiro', 'Trecho', 'Data', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de passagem aérea foi sincronizado para o período.' },
-      reembolsos: { titulo: 'Reembolsos', subtitulo: 'Solicitações de despesas e aprovação financeira.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Despesa', 'Data', 'Valor', 'Status'], rows: [], tableNote: 'Nenhum reembolso foi sincronizado para o período.' },
+      costs: { titulo: 'Custos', subtitulo: '', isTable: true, grid: '1.4fr 1fr 1fr 1fr', columns: ['Tipo de custo', 'Registros', 'Total', 'Status'], rows: ['Hospedagem', 'Transporte', 'Passagens aéreas', 'Reembolsos'].map(name => ({ cells: [name, '0', brl(0), 'Aguardando integração'] })), tableNote: 'As fontes de custo ainda não estão conectadas ao schema de medição.' },
+      transport: { titulo: 'Transporte & Rotas', subtitulo: 'Kanban de viagens, programação do dia, quadro detalhado e linha do tempo.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Solicitante', 'Data', 'Origem / destino', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de transporte foi sincronizado para o período.' },
+      hospedagem: { titulo: 'Hospedagem', subtitulo: '', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Entrada', 'Saída', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de hospedagem foi sincronizado para o período.' },
+      passagens: { titulo: 'Passagens Aéreas', subtitulo: '', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Passageiro', 'Trecho', 'Data', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de passagem aérea foi sincronizado para o período.' },
+      reembolsos: { titulo: 'Reembolsos', subtitulo: '', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Despesa', 'Data', 'Valor', 'Status'], rows: [], tableNote: 'Nenhum reembolso foi sincronizado para o período.' },
       reports: { titulo: 'Relatórios & Análises', subtitulo: 'Exportações rastreáveis a partir das mesmas fontes usadas pelo BM.', isReports: true, cards: [
         { titulo: 'Relatório de Medição', meta: 'Horas e pessoas por colaborador/BSP no período.', acao: 'Baixar CSV', click: exportCsv('relatorio-medicao', [['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.'], ...peopleCatalog.map(row => [row.name, row.func, row.bsp, row.dateLabel, row.normal, row.overtime])]) },
         { titulo: 'Embarques do período', meta: 'Pessoas identificadas e datas de presença por BSP.', acao: 'Baixar CSV', click: exportCsv('embarques-periodo', [['Colaborador', 'BSP', 'Data', 'Fonte'], ...rawPeople.map(row => [row.name, row.bsp, row.date, row.source])]) },
@@ -1551,7 +1583,7 @@ class Component extends DCLogic {
       ], tableNote: 'Cada rotina deve preservar a origem, o período e o usuário responsável pela confirmação.' }
     };
     const nominationCards = all.map(row => ({ codigo: 'BSP ' + row.n, titulo: row.pessoas.length + ' pessoa(s) identificada(s)', meta: row.cli + ' · ' + row.un }));
-    referenceModules.nominations = { titulo: 'Nomeações', subtitulo: 'Fluxo de solicitação, logística, validação e formação de equipes.', isBoard: true, board: [
+    referenceModules.nominations = { titulo: 'Nomeações', subtitulo: '16 em andamento', isBoard: true, board: [
       { nome: 'Solicitação', count: '0', cards: [] },
       { nome: 'Recebido pela logística', count: '0', cards: [] },
       { nome: 'Aprovação técnica', count: String(all.length), cards: nominationCards.slice(0, 6) },
@@ -1583,6 +1615,30 @@ class Component extends DCLogic {
     });
     module.hasDrafts = moduleDrafts.length > 0 || (s.moduleMessage && s.moduleMessageModule === s.modulo);
     module.draftMessage = moduleDrafts.length ? moduleDrafts.length + ' rascunho(s) salvo(s) neste navegador. ' + (s.moduleMessage || 'Eles permanecem aguardando confirmação.') : (s.moduleMessage || '');
+    const screenConfig = screenConfigs[s.modulo];
+    module.isScreenHeader = Boolean(screenConfig);
+    module.isStandardHeader = !screenConfig;
+    module.showKpis = screenConfig ? Boolean(screenConfig.showKpis) : true;
+    module.showChipFilters = !screenConfig;
+    module.hasScreenFilters = Boolean(screenConfig && screenConfig.filters.length);
+    module.updatedAt = screenConfig ? screenConfig.updatedAt : '';
+    module.canImport = Boolean(screenConfig && screenConfig.canImport);
+    module.importLabel = screenConfig ? screenConfig.importLabel : '';
+    module.importAction = () => this.setState({ moduleMessage: 'Importação preparada: selecione a planilha oficial para validar antes de gravar.', moduleMessageModule: s.modulo });
+    module.exportAction = () => exportCsv(s.modulo + '-relatorio', [['Módulo', 'Período', 'Status'], [module.titulo, periodoAtual, 'Exportação preparada']])();
+    module.screenTabs = screenConfig ? screenConfig.tabs.map(([id, nome], index) => ({ nome, style: s.screenTab === id || (!s.screenTab && index === 0) ? 'height: 31px; padding: 0 12px; border: 0; border-radius: 8px; background: #fff; color: #0B2340; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 1px 3px rgba(11,35,64,.10);' : 'height: 31px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #45627D; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;', click: () => this.setState({ screenTab: id }) })) : [];
+    module.screenFilters = screenConfig ? screenConfig.filters.map(([id, label, type, placeholder, width]) => ({ id, label, type, placeholder, width, isSelect: ['Todos', 'Todas'].includes(placeholder) || ['Unidade', 'BSP', 'Hotel', 'Motivo', 'Status', 'Cliente'].includes(label), isText: !(['Todos', 'Todas'].includes(placeholder) || ['Unidade', 'BSP', 'Hotel', 'Motivo', 'Status', 'Cliente'].includes(label)) })) : [];
+    if (screenConfig && screenConfig.kpis) module.kpis = screenConfig.kpis;
+    if (s.modulo === 'transport') {
+      module.isTable = false;
+      module.isBoard = true;
+      module.board = [
+        { nome: 'Solicitado', count: '0', cards: [] },
+        { nome: 'Programado', count: '0', cards: [] },
+        { nome: 'Em trânsito', count: '0', cards: [] },
+        { nome: 'Concluído', count: '0', cards: [] }
+      ];
+    }
 
     const periodoAtual = all[0] && all[0].periodo ? all[0].periodo : '26/08 – 25/09/2026';
     return {
