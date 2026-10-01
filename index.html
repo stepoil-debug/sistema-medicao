@@ -44,6 +44,13 @@
     </div>
   </div>
 
+  <div style="flex: none; display: flex; align-items: center; gap: 6px; padding: 0 22px; min-height: 48px; background: #223D5D; border-bottom: 1px solid #1B334F; overflow-x: auto;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-right: 10px; padding-right: 14px; border-right: 1px solid rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap;">STEP · Operação</div>
+    <sc-for list="{{ moduleNav }}" as="m" hint-placeholder-count="8">
+      <button onClick="{{ m.click }}" style="{{ m.style }}">{{ m.nome }}</button>
+    </sc-for>
+  </div>
+
   <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 12px 26px; background: #FFFFFF; border-bottom: 1px solid #EDF2F8;">
     <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
       <button onClick="{{ t.click }}" style="{{ t.style }}">{{ t.nome }}</button>
@@ -59,6 +66,109 @@
   </div>
 
   <div style="flex: 1; min-height: 0; overflow-y: auto; background: #F4F8FB;">
+
+  <sc-if value="{{ isReferenceModule }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="background: #fff; border-bottom: 1px solid #EDF2F8; padding: 22px 26px 20px; display: flex; align-items: flex-start; gap: 20px;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">STEP · Operação integrada</div>
+        <div style="font-size: 27px; font-weight: 700; letter-spacing: -.025em; color: #0B2340; margin: 6px 0 5px;">{{ module.titulo }}</div>
+        <div style="font-size: 13px; color: #5B7185;">{{ module.subtitulo }}</div>
+      </div>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ module.refresh }}" style="height: 38px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;">Atualizar dados</button>
+    </div>
+
+    <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px;">
+        <sc-for list="{{ module.kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 16px; padding: 16px 18px;">
+            <div style="font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #93A6B8;">{{ k.k }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #0B2340; margin-top: 8px;">{{ k.v }}</div>
+            <div style="font-size: 11px; color: #5B7185; margin-top: 4px;">{{ k.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <sc-for list="{{ module.filters }}" as="f" hint-placeholder-count="6">
+          <button onClick="{{ f.click }}" style="{{ f.style }}">{{ f.nome }}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ module.isBoard }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(230px,1fr)); gap: 12px; overflow-x: auto;">
+          <sc-for list="{{ module.board }}" as="col" hint-placeholder-count="4">
+            <div style="background: #F8FBFF; border: 1px solid #E4EDF7; border-radius: 16px; padding: 12px; min-height: 330px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 3px 4px 12px;">
+                <span style="font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #5B7185;">{{ col.nome }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #1355C2;">{{ col.count }}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <sc-for list="{{ col.cards }}" as="card" hint-placeholder-count="3">
+                  <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 12px; padding: 12px; box-shadow: 0 1px 2px rgba(11,35,64,.04);">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #1355C2;">{{ card.codigo }}</div>
+                    <div style="font-size: 13px; font-weight: 700; color: #0B2340; margin-top: 5px;">{{ card.titulo }}</div>
+                    <div style="font-size: 11px; color: #5B7185; margin-top: 5px;">{{ card.meta }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ module.isTable }}" hint-placeholder-val="{{ false }}">
+        <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 18px; overflow: hidden;">
+          <div style="display: grid; grid-template-columns: {{ module.grid }}; gap: 12px; padding: 12px 16px; background: #F7FAFD; border-bottom: 1px solid #EDF2F8; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B7C8F;">
+            <sc-for list="{{ module.columns }}" as="column" hint-placeholder-count="5"><div>{{ column }}</div></sc-for>
+          </div>
+          <sc-for list="{{ module.rows }}" as="row" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: {{ module.grid }}; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F1F5F9;">
+              <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="5"><div style="font-size: 12px; color: #24374B; overflow-wrap: anywhere;">{{ cell }}</div></sc-for>
+            </div>
+          </sc-for>
+          <div style="padding: 14px 16px; color: #93A6B8; font-size: 12px;">{{ module.tableNote }}</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ module.isReports }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(230px,1fr)); gap: 12px;">
+          <sc-for list="{{ module.cards }}" as="card" hint-placeholder-count="6">
+            <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 16px; padding: 17px; display: flex; flex-direction: column; gap: 9px;">
+              <div style="font-size: 14px; font-weight: 700; color: #0B2340;">{{ card.titulo }}</div>
+              <div style="font-size: 12px; line-height: 1.45; color: #5B7185; flex: 1;">{{ card.meta }}</div>
+              <button onClick="{{ card.click }}" style="height: 34px; border: 0; border-radius: 10px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">{{ card.acao }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ module.isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: minmax(300px, .8fr) minmax(0, 1.2fr); gap: 16px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 18px; padding: 18px;">
+            <div style="font-size: 16px; font-weight: 700; color: #0B2340;">{{ module.formTitulo }}</div>
+            <div style="font-size: 12px; color: #5B7185; margin: 5px 0 14px;">{{ module.formSubtitulo }}</div>
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <input placeholder="Nome do cadastro" style="height: 36px; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px;">
+              <input placeholder="Descrição / perfil" style="height: 36px; padding: 0 10px; border: 1px solid #DCE5EE; border-radius: 9px;">
+              <button style="height: 36px; border: 0; border-radius: 10px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">Cadastrar</button>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 18px; overflow: hidden;">
+            <div style="padding: 17px 18px; font-size: 16px; font-weight: 700; color: #0B2340;">{{ module.listaTitulo }}</div>
+            <sc-for list="{{ module.rows }}" as="row" hint-placeholder-count="8">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 12px 18px; border-top: 1px solid #F1F5F9;">
+                <div><div style="font-size: 13px; font-weight: 600; color: #0B2340;">{{ row.titulo }}</div><div style="font-size: 11px; color: #5B7185; margin-top: 3px;">{{ row.meta }}</div></div>
+                <span style="font-size: 11px; font-weight: 600; color: #1B7A55;">{{ row.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
 
   <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ true }}">
   <div>
@@ -911,7 +1021,7 @@ function liveBspRows(summary, lines, peopleRows) {
 }
 
 class Component extends DCLogic {
-  state = { tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, liveError: '', rateCatalog: [], rateError: '', rateDraft: {}, rateSaving: false };
+  state = { modulo: 'medicao', tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', moduleFilter: 'todos', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, liveBsps: null, sourceLines: [], sourcePeople: [], liveError: '', rateCatalog: [], rateError: '', rateDraft: {}, rateSaving: false };
 
   componentDidMount() {
     this.loadLiveData();
@@ -963,7 +1073,7 @@ class Component extends DCLogic {
       const live = liveBspRows(summary, lines, people);
       if (live.length) {
         const selectedBsp = live.some(row => row.n === this.state.bsp) ? this.state.bsp : live[0].n;
-        this.setState({ liveBsps: live, bsp: selectedBsp, novoBsp: this.state.novoBsp || selectedBsp, liveError: '' });
+        this.setState({ liveBsps: live, sourceLines: lines, sourcePeople: people, bsp: selectedBsp, novoBsp: this.state.novoBsp || selectedBsp, liveError: '' });
       }
     } catch (error) {
       this.setState({ liveError: error instanceof Error ? error.message : String(error) });
@@ -1257,12 +1367,98 @@ class Component extends DCLogic {
       n: embCur.n, cliente: embCur.cli, unidade: embCur.un,
       irBsp: () => this.setState({ tela: 'bm', bsp: embCur.n, secao: 'resumo' })
     };
+    const moduleNav = [
+      ['medicao', 'Boletim de Medição'], ['histograma', 'Histograma Offshore'], ['timesheet', 'Timesheet Offshore'],
+      ['nominations', 'Nomeações'], ['transport', 'Transporte'], ['hospedagem', 'Hospedagem'], ['passagens', 'Passagens Aéreas'],
+      ['reembolsos', 'Reembolsos'], ['collaborators', 'Colaboradores'], ['costs', 'Custos'], ['rates-catalog', 'Rates'],
+      ['reports', 'Relatórios'], ['settings', 'Configurações'], ['flow-track', 'Flow Track']
+    ].map(([id, nome]) => ({ id, nome, click: () => this.setState({ modulo: id, tela: 'painel', moduleFilter: 'todos' }), style: s.modulo === id ? 'height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: #5D7894; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap;' : 'height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: rgba(255,255,255,.78); font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;' }));
     const tabs = [{ id: 'painel', nome: 'Painel de medição' }, { id: 'novo', nome: 'Novo boletim' }]
-      .map(t => ({ nome: t.nome, style: this.pill(s.tela === t.id), click: () => this.setState({ tela: t.id }) }));
+      .map(t => ({ nome: t.nome, style: this.pill(s.modulo === 'medicao' && s.tela === t.id), click: () => this.setState({ modulo: 'medicao', tela: t.id }) }));
+
+    const rawPeople = s.sourcePeople && s.sourcePeople.length ? s.sourcePeople.map(row => ({
+      name: row.employee_name || 'Pessoa sem nome', func: row.employee_function || 'Função não informada', bsp: row.bsp || 'Sem BSP',
+      date: String(row.work_date || '').slice(0, 10), normal: Number(row.normal_hours || 0), overtime: Number(row.overtime_hours || 0), source: row.source_mode || 'RDO'
+    })) : all.flatMap(b => b.pessoas.map(p => ({ name: p.nome, func: p.funcaoBase || p.funcao, bsp: b.n, date: '', normal: 0, overtime: 0, source: 'Histograma' })));
+    const personMap = new Map();
+    rawPeople.forEach(row => {
+      const key = row.name + '|' + row.func + '|' + row.bsp;
+      if (!personMap.has(key)) personMap.set(key, { ...row, dates: new Set(), normal: 0, overtime: 0 });
+      const target = personMap.get(key);
+      if (row.date) target.dates.add(row.date);
+      target.normal += row.normal;
+      target.overtime += row.overtime;
+    });
+    const peopleCatalog = Array.from(personMap.values()).map(row => ({
+      ...row, days: row.dates.size, dateLabel: row.dates.size ? String(row.dates.size) : '—', status: row.source === 'Timesheet' ? 'Timesheet' : 'RDO'
+    })).filter(row => s.moduleFilter === 'todos' || row.bsp === s.moduleFilter);
+    const distinctPeople = new Set(peopleCatalog.map(row => row.name)).size;
+    const distinctDays = new Set(rawPeople.filter(row => !s.moduleFilter || s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).map(row => row.date).filter(Boolean)).size;
+    const normalHours = peopleCatalog.reduce((sum, row) => sum + row.normal, 0);
+    const overtimeHours = peopleCatalog.reduce((sum, row) => sum + row.overtime, 0);
+    const moduleFilters = [{ id: 'todos', nome: 'Todos' }].concat(all.map(b => ({ id: b.n, nome: b.n }))).map(filter => ({
+      nome: filter.nome, style: this.chip((s.moduleFilter || 'todos') === filter.id), click: () => this.setState({ moduleFilter: filter.id })
+    }));
+    const moduleKpis = [
+      { k: 'Pessoas identificadas', v: String(distinctPeople), sub: 'RDO / Timesheet no período' },
+      { k: 'Dias com lançamento', v: String(distinctDays), sub: 'datas operacionais distintas' },
+      { k: 'Horas normais', v: normalHours.toFixed(2) + ' h', sub: 'apontamentos importados' },
+      { k: 'H.E. / noturno', v: overtimeHours.toFixed(2) + ' h', sub: 'pendente de rate quando aplicável' }
+    ];
+    const tableRows = peopleCatalog.map(row => ({ cells: [row.name, row.func, row.bsp, row.dateLabel, row.normal.toFixed(2) + ' h', row.overtime.toFixed(2) + ' h', row.status] }));
+    const exportCsv = (name, rows) => () => {
+      const csv = rows.map(row => row.map(value => '"' + String(value ?? '').replaceAll('"', '""') + '"').join(';')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a');
+      link.href = url; link.download = name + '.csv'; link.click(); URL.revokeObjectURL(url);
+    };
+    const referenceModules = {
+      histograma: { titulo: 'Histograma Offshore', subtitulo: 'Lançamentos e presença por colaborador, BSP e período.', isTable: true, grid: '1.6fr 1fr .8fr .7fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.', 'Fonte'], rows: tableRows, tableNote: 'Dados operacionais derivados do snapshot da medição; a fonte original permanece somente leitura.' },
+      timesheet: { titulo: 'Timesheet Offshore', subtitulo: 'Cópia de leitura dos lançamentos do Timesheet e fallback documentado do RDO.', isTable: true, grid: '1.6fr 1fr .8fr .7fr 1fr 1fr .8fr', columns: ['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.', 'Fonte'], rows: tableRows, tableNote: s.sourcePeople.length ? 'Timesheet/RDO sincronizados para o período selecionado.' : 'Nenhum Timesheet semanal foi localizado; os registros exibidos vêm do RDO concluído.' },
+      collaborators: { titulo: 'Colaboradores', subtitulo: 'Cadastro central usado no Histograma, Timesheet, Rates e Medição.', isTable: true, grid: '1.8fr 1.2fr 1fr .8fr .8fr', columns: ['Nome', 'Função', 'BSP principal', 'Dias', 'Status'], rows: peopleCatalog.map(row => ({ cells: [row.name, row.func, row.bsp, row.dateLabel, 'Ativo'] })), tableNote: 'A consolidação usa o nome e a função informados pelas fontes operacionais.' },
+      'rates-catalog': { titulo: 'Rates', subtitulo: 'Cadastro por cliente, unidade, BSP e função usado pelo cálculo automático do BM.', isTable: true, grid: '1.4fr 1fr 1fr 1fr 1fr 1fr', columns: ['Função', 'BSP', 'Diária', 'Hora extra', 'Noturno', 'Status'], rows: (s.rateCatalog || []).filter(row => !s.moduleFilter || s.moduleFilter === 'todos' || row.bsp === s.moduleFilter).map(row => ({ cells: [row.employee_function, row.bsp || 'Todos', row.category === 'daily' ? brl(row.rate) : '—', row.category === 'overtime_hours' ? brl(row.rate) : '—', row.category === 'night_hours' ? brl(row.rate) : '—', 'Confirmado'] })), tableNote: s.rateCatalog && s.rateCatalog.length ? 'Confira os valores localizados e confirme qualquer alteração no BM antes de avançar.' : 'Nenhum rate confirmado ainda. Abra um BM, informe os valores da Commercial offer e confirme por cliente/função.' },
+      costs: { titulo: 'Custos', subtitulo: 'Visão consolidada de hospedagem, transporte, passagens e demais custos.', isTable: true, grid: '1.4fr 1fr 1fr 1fr', columns: ['Tipo de custo', 'Registros', 'Total', 'Status'], rows: ['Hospedagem', 'Transporte', 'Passagens aéreas', 'Reembolsos'].map(name => ({ cells: [name, '0', brl(0), 'Aguardando integração'] })), tableNote: 'As fontes de custo ainda não estão conectadas ao schema de medição.' },
+      transport: { titulo: 'Transporte', subtitulo: 'Solicitações e viagens de mobilização/desmobilização vinculadas à BSP.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Solicitante', 'Data', 'Origem / destino', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de transporte foi sincronizado para o período.' },
+      hospedagem: { titulo: 'Hospedagem', subtitulo: 'Reservas e diárias de hotel pré-embarque vinculadas ao colaborador.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Entrada', 'Saída', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de hospedagem foi sincronizado para o período.' },
+      passagens: { titulo: 'Passagens Aéreas', subtitulo: 'Controle de reservas, trechos e custos de deslocamento.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Passageiro', 'Trecho', 'Data', 'BSP', 'Status'], rows: [], tableNote: 'Nenhum lançamento de passagem aérea foi sincronizado para o período.' },
+      reembolsos: { titulo: 'Reembolsos', subtitulo: 'Solicitações de despesas e aprovação financeira.', isTable: true, grid: '1.3fr 1fr 1fr 1fr 1fr', columns: ['Colaborador', 'Despesa', 'Data', 'Valor', 'Status'], rows: [], tableNote: 'Nenhum reembolso foi sincronizado para o período.' },
+      reports: { titulo: 'Relatórios & Análises', subtitulo: 'Exportações rastreáveis a partir das mesmas fontes usadas pelo BM.', isReports: true, cards: [
+        { titulo: 'Relatório de Medição', meta: 'Horas e pessoas por colaborador/BSP no período.', acao: 'Baixar CSV', click: exportCsv('relatorio-medicao', [['Colaborador', 'Função', 'BSP', 'Dias', 'Horas normais', 'H.E.'], ...peopleCatalog.map(row => [row.name, row.func, row.bsp, row.dateLabel, row.normal, row.overtime])]) },
+        { titulo: 'Embarques do período', meta: 'Pessoas identificadas e datas de presença por BSP.', acao: 'Baixar CSV', click: exportCsv('embarques-periodo', [['Colaborador', 'BSP', 'Data', 'Fonte'], ...rawPeople.map(row => [row.name, row.bsp, row.date, row.source])]) },
+        { titulo: 'Pendências de medição', meta: 'Rates, PO, aprovação de fonte e validações do motor.', acao: 'Baixar CSV', click: exportCsv('pendencias-medicao', [['BSP', 'Erros', 'Avisos'], ...all.map(row => [row.n, row.liveErrors, row.liveWarnings])]) },
+        { titulo: 'Timesheets lançados', meta: 'Um lançamento por pessoa e data, com jornada e hora extra.', acao: 'Baixar CSV', click: exportCsv('timesheets-lancados', [['Colaborador', 'Função', 'BSP', 'Data', 'Normal', 'Extra'], ...rawPeople.map(row => [row.name, row.func, row.bsp, row.date, row.normal, row.overtime])]) },
+        { titulo: 'Custos consolidados', meta: 'Resumo por tipo de custo para futura integração logística.', acao: 'Baixar CSV', click: exportCsv('custos-consolidados', [['Tipo', 'Registros', 'Total'], ['Hospedagem', 0, 0], ['Transporte', 0, 0], ['Passagens', 0, 0]]) },
+        { titulo: 'Headcount operacional', meta: 'Pessoas, dias e horas importados das fontes de produção.', acao: 'Baixar CSV', click: exportCsv('headcount-operacional', [['Pessoas', 'Dias', 'Horas normais', 'Horas extras'], [distinctPeople, distinctDays, normalHours, overtimeHours]]) }
+      ] },
+      settings: { titulo: 'Configurações', subtitulo: 'Cadastros mestres, parâmetros de integração e perfis do sistema.', isSettings: true, formTitulo: 'Novo cadastro mestre', formSubtitulo: 'Os cadastros são isolados no módulo de medição.', listaTitulo: 'Status das integrações', rows: [
+        { titulo: 'RDO', meta: '18 documentos · 70 lançamentos sincronizados', status: 'Conectado' },
+        { titulo: 'Timesheet Offshore', meta: s.sourcePeople.some(row => row.source_mode === 'Timesheet') ? 'Dados semanais localizados' : '0 semanas/tarefas localizadas', status: s.sourcePeople.some(row => row.source_mode === 'Timesheet') ? 'Conectado' : 'Sem dados' },
+        { titulo: 'Rates / Commercial offer', meta: (s.rateCatalog || []).length + ' regras confirmadas', status: (s.rateCatalog || []).length ? 'Conectado' : 'Pendente' },
+        { titulo: 'Schema medicao', meta: 'Snapshots, cálculo, versões e RLS ativos', status: 'Ativo' }
+      ] },
+      'flow-track': { titulo: 'Flow Track', subtitulo: 'Monitoramento e auditoria das atividades que alimentam a medição.', isTable: true, grid: '1.3fr 1.2fr 1fr 1fr', columns: ['Módulo', 'Atividade', 'Resultado', 'Status'], rows: [
+        { cells: ['RDO', 'Sincronização do período', '18 documentos · 70 lançamentos', 'Concluído'] },
+        { cells: ['Timesheet Offshore', 'Sincronização semanal', s.sourcePeople.some(row => row.source_mode === 'Timesheet') ? 'Dados encontrados' : '0 períodos · 0 dias', s.sourcePeople.some(row => row.source_mode === 'Timesheet') ? 'Concluído' : 'Aguardando dados'] },
+        { cells: ['Medição', 'Geração de rascunhos', all.length + ' BSPs', 'Concluído'] },
+        { cells: ['Rates', 'Validação comercial', all.reduce((sum, row) => sum + Number(row.liveErrors || 0), 0) + ' pendências', 'Revisão necessária'] }
+      ], tableNote: 'Cada rotina deve preservar a origem, o período e o usuário responsável pela confirmação.' }
+    };
+    const nominationCards = all.map(row => ({ codigo: 'BSP ' + row.n, titulo: row.pessoas.length + ' pessoa(s) identificada(s)', meta: row.cli + ' · ' + row.un }));
+    referenceModules.nominations = { titulo: 'Nomeações', subtitulo: 'Fluxo de solicitação, logística, validação e formação de equipes.', isBoard: true, board: [
+      { nome: 'Solicitação', count: '0', cards: [] },
+      { nome: 'Recebido pela logística', count: '0', cards: [] },
+      { nome: 'Aprovação técnica', count: String(all.length), cards: nominationCards.slice(0, 6) },
+      { nome: 'Equipe formada', count: String(all.length), cards: nominationCards.slice(0, 6) }
+    ] };
+    const module = referenceModules[s.modulo] || referenceModules.histograma;
+    module.kpis = module.kpis || moduleKpis;
+    module.filters = module.filters || moduleFilters;
+    module.refresh = () => this.loadLiveData();
+    module.isReference = s.modulo !== 'medicao';
 
     const periodoAtual = all[0] && all[0].periodo ? all[0].periodo : '26/08 – 25/09/2026';
     return {
-      tabs, novo, rate, isNovo: s.tela === 'novo', isRates: s.tela === 'rates', irNovo: go('novo'), isPainel: s.tela === 'painel', isEmb: s.tela === 'emb', isBM: s.tela === 'bm',
+      moduleNav, module, isReferenceModule: s.modulo !== 'medicao',
+      tabs, novo, rate, isNovo: s.modulo === 'medicao' && s.tela === 'novo', isRates: s.modulo === 'medicao' && s.tela === 'rates', irNovo: () => this.setState({ modulo: 'medicao', tela: 'novo' }), isPainel: s.modulo === 'medicao' && s.tela === 'painel', isEmb: s.modulo === 'medicao' && s.tela === 'emb', isBM: s.modulo === 'medicao' && s.tela === 'bm',
       kpis, bsps, qtdBsp: String(all.length), agenda, alertas,
       irEmbarques: go('emb'), irPainel: go('painel'),
       dias: DIAS, linhas, embKpis, filtros, legenda,

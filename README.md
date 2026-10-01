@@ -45,6 +45,12 @@ Timesheet/RDO/outras fontes
 - `src/`: reservado para o código do produto.
 - `tests/`: reservado para testes do motor de cálculo e integrações.
 
+### Módulos replicados da referência
+
+Além do BM, a interface agora organiza Histograma Offshore, Timesheet Offshore, Nomeações, Transporte, Hospedagem, Passagens Aéreas, Reembolsos, Colaboradores, Custos, Rates, Relatórios, Configurações e Flow Track. O mapa detalhado, a origem de cada dado e os limites da integração estão em [`docs/referencia-modular.md`](docs/referencia-modular.md).
+
+Os módulos exibem somente dados que existem no schema de medição. Onde a fonte ainda não foi conectada, a tela informa a pendência em vez de criar registros fictícios.
+
 ## Execução no ambiente conectado
 
 Com `SUPABASE_DB_URL_DASHBOARD` configurada em variável de ambiente:
