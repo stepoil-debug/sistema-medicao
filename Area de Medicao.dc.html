@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F4F8FB; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #12202E; }
+  * { box-sizing: border-box; }
+  a { color: #1355C2; text-decoration: none; }
+  a:hover { color: #0E4092; text-decoration: underline; }
+  select, input, button { font-family: inherit; font-size: inherit; color: inherit; }
+</style>
+</helmet>
+
+<div style="width: 1680px; height: 1010px; background: #F4F8FB;">
+<div style="width: 100%; height: 100%; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="flex: none; display: flex; align-items: center; gap: 16px; padding: 0 16px; height: 54px; background: #FFFFFF; border-bottom: 1px solid #EDF2F8;">
+    <div style="display: flex; gap: 7px;">
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #E05C5C;"></div>
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #F0B429;"></div>
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #3CC29A;"></div>
+    </div>
+    <img src="assets/step-logo.png" alt="STEP Integrated Solutions" style="height: 30px; width: auto; display: block; mix-blend-mode: multiply;">
+    <div style="width: 1px; height: 18px; background: #DCE5EE;"></div>
+    <div style="display: flex; gap: 4px; padding: 4px; border: 1px solid #E1E9F4; border-radius: 999px; background: #F8FBFF;">
+      <a href="Painel BSP.dc.html" style="height: 30px; padding: 0 14px; display: flex; align-items: center; border-radius: 999px; color: #55677A; font-size: 12px; font-weight: 500; white-space: nowrap; text-decoration: none;" style-hover="background: #EAF1F8; color: #0B2340; text-decoration: none;">Carteira de BSPs</a>
+      <span style="height: 30px; padding: 0 14px; display: flex; align-items: center; border-radius: 999px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;">Área de medição</span>
+      <a href="Ferramental Habitat.dc.html" style="height: 30px; padding: 0 14px; display: flex; align-items: center; border-radius: 999px; color: #55677A; font-size: 12px; font-weight: 500; white-space: nowrap; text-decoration: none;" style-hover="background: #EAF1F8; color: #0B2340; text-decoration: none;">Ferramental habitat</a>
+    </div>
+    <div style="flex: 1;"></div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7E93A8;">02 out 2026</div>
+    <div style="display: flex; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid #DCE5EE;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: #1355C2; color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">RM</div>
+      <span style="font-size: 12px; color: #55677A;">R. Marques</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto; background: #F4F8FB;">
+    <div style="background: #fff; border-bottom: 1px solid #EDF2F8; padding: 22px 26px 20px; display: flex; align-items: flex-start; gap: 20px;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">Área de medição</div>
+        <div style="font-size: 27px; font-weight: 700; letter-spacing: -.025em; color: #0B2340; margin: 6px 0 5px;">Medições das BSPs</div>
+        <div style="font-size: 13px; color: #5B7185;">Boletins, histogramas de embarque, ferramental e reembolsáveis de cada BSP, em ordem numérica.</div>
+      </div>
+      <div style="flex: 1;"></div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="height: 38px; padding: 0 14px; display: flex; align-items: center; gap: 8px; border: 1px solid #FFE3BF; border-radius: 12px; background: #FFF7EC; color: #A45F00; font-size: 13px; font-weight: 600; white-space: nowrap;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #E08A00;"></span>Período 26/08 – 25/09 fechado
+        </div>
+        <div style="height: 38px; padding: 0 14px; display: flex; align-items: center; gap: 8px; border: 1px solid #DFF0E6; border-radius: 12px; background: #F3FBF6; color: #1B7A55; font-size: 13px; font-weight: 600; white-space: nowrap;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #2FA97C;"></span>Dados sincronizados
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 20px; background: linear-gradient(100deg, #EAF3FD 0%, #F7FBFF 62%, #FFFFFF 100%); border: 1px solid #DEEBF8; border-radius: 16px; padding: 18px 20px;">
+        <div style="width: 52px; height: 52px; border-radius: 16px; flex: none; background: linear-gradient(140deg, #1E86D8, #0E4AA8); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(14,74,168,.24); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600;">BM</div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 17px; font-weight: 700; color: #0B2340;">Visão geral das medições</div>
+          <div style="font-size: 13px; color: #5B7185; margin-top: 3px;">Valores do período atual consolidados a partir dos lançamentos de cada BSP.</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="padding: 0 22px; border-left: 1px solid #DCEAF8;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 21px; font-weight: 600; white-space: nowrap; color: {{ k.cor }};">{{ k.v }}</div>
+            <div style="font-size: 11px; color: #5B7185; margin-top: 2px; white-space: nowrap;">{{ k.k }}</div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-end; gap: 16px;">
+        <div>
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">Suas BSPs</div>
+          <div style="font-size: 19px; font-weight: 700; color: #0B2340; letter-spacing: -.02em; margin-top: 4px;">BSPs em medição</div>
+          <div style="font-size: 12px; color: #5B7185; margin-top: 3px;">{{ contagem }} · um clique mostra o resumo, o botão abre as medições da BSP.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 7px; background: #fff; border: 1px solid #E1E9F4; border-radius: 999px; padding: 0 13px; height: 34px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #5B7185;">Nº</span>
+          <input value="{{ fq }}" onChange="{{ onQ }}" placeholder="buscar 25-687…" style="border: 0; outline: 0; width: 110px; font-size: 12px; background: transparent; font-family: 'IBM Plex Mono', monospace;">
+        </div>
+        <select value="{{ fpm }}" onChange="{{ onPm }}" style="height: 34px; padding: 0 11px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; color: #2C3E50;">
+          <sc-for list="{{ optPm }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+        </select>
+        <select value="{{ fcli }}" onChange="{{ onCli }}" style="height: 34px; padding: 0 11px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; color: #2C3E50;">
+          <sc-for list="{{ optCli }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+        </select>
+        <select value="{{ fst }}" onChange="{{ onSt }}" style="height: 34px; padding: 0 11px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; color: #2C3E50;">
+          <sc-for list="{{ optSt }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+        </select>
+        <button onClick="{{ togExc }}" style="{{ chipExc }}">Saldo excedido</button>
+        <button onClick="{{ togSemPo }}" style="{{ chipSemPo }}">Sem valor de PO</button>
+        <div style="flex: 1;"></div>
+        <button onClick="{{ limpar }}" style="height: 34px; padding: 0 14px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: #5B7185; font-size: 12px; cursor: pointer; white-space: nowrap;" style-hover="background: #E9F1FA; color: #0B2340;">Limpar filtros</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <sc-for list="{{ cards }}" as="b" hint-placeholder-count="5">
+        <div style="background: linear-gradient(100deg, #F6FAFF 0%, #FFFFFF 44%); border: 1px solid #E6EEF8; border-radius: 18px; box-shadow: 0 1px 2px rgba(11,35,64,.04);" style-hover="border-color: #CFE0F3; box-shadow: 0 10px 26px rgba(14,74,168,.10);">
+          <div onClick="{{ b.toggle }}" style="display: flex; align-items: flex-start; gap: 16px; padding: 16px 18px; cursor: pointer;">
+            <div style="width: 56px; height: 56px; border-radius: 18px; flex: none; background: linear-gradient(140deg, #1E86D8, #0E4AA8); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(14,74,168,.22);">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .1em; color: rgba(255,255,255,.72);">BSP</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #fff;">{{ b.n }}</span>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-size: 16px; font-weight: 700; color: #0B2340; letter-spacing: -.015em;">{{ b.nome }}</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 999px; white-space: nowrap; background: {{ b.tint }}; color: {{ b.cor }};"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ b.cor }};"></span>BM {{ b.bm }} · {{ b.status }}</span>
+                <span style="font-size: 11px; color: #93A6B8; font-family: 'IBM Plex Mono', monospace;">{{ b.familia }}</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(8, minmax(0,1fr)); gap: 14px 18px; margin-top: 13px; padding-top: 13px; border-top: 1px solid #EDF2F8;">
+                <sc-for list="{{ b.campos }}" as="c" hint-placeholder-count="8">
+                <div style="min-width: 0;">
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8;">{{ c.k }}</div>
+                  <div style="font-size: 13px; margin-top: 3px; line-height: 1.35; overflow-wrap: anywhere; color: {{ c.cor }};">{{ c.v }}</div>
+                </div>
+                </sc-for>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                <div style="flex: 1; height: 5px; background: #E7EFF9; border-radius: 3px; overflow: hidden; display: flex;">
+                  <div style="height: 5px; background: #A9C8EE; width: {{ b.wEmit }};"></div>
+                  <div style="height: 5px; background: {{ b.barAtual }}; width: {{ b.wAtual }};"></div>
+                </div>
+                <span style="font-size: 11px; white-space: nowrap; color: {{ b.usoCor }};">{{ b.uso }}</span>
+              </div>
+            </div>
+            <div style="width: 30px; height: 30px; border-radius: 50%; flex: none; background: #fff; border: 1px solid #E6EEF8; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #1E86D8;">{{ b.caret }}</div>
+          </div>
+
+          <sc-if value="{{ b.aberta }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 4px 18px 20px 90px; border-top: 1px solid #EDF2F8;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8; margin: 16px 0 10px;">Resumo das medições</div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;">
+              <sc-for list="{{ b.resumo }}" as="r" hint-placeholder-count="4">
+              <div onClick="{{ r.click }}" style="background: #fff; border: 1px solid #E6EEF8; border-radius: 14px; padding: 13px 15px; cursor: pointer; display: flex; flex-direction: column; gap: 6px;" style-hover="border-color: #1E86D8; box-shadow: 0 6px 18px rgba(14,74,168,.12);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #93A6B8;">{{ r.n }}</span>
+                  <span style="font-size: 13px; font-weight: 600; color: #0B2340; flex: 1;">{{ r.nome }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #EFF5FD; color: #1355C2; white-space: nowrap;">{{ r.badge }}</span>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; color: #0B2340;">{{ r.valor }}</div>
+                <div style="font-size: 11px; color: #5B7185;">{{ r.meta }}</div>
+              </div>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 26px; margin-top: 16px; align-items: end;">
+              <div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8; margin-bottom: 12px;">Últimas medições</div>
+                <sc-for list="{{ b.eventos }}" as="u" hint-placeholder-count="4">
+                <div style="display: grid; grid-template-columns: 12px minmax(0,1fr); gap: 12px; align-items: start; padding-bottom: 12px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; padding-top: 5px;">
+                    <div style="width: 7px; height: 7px; border-radius: 50%; background: {{ u.cor }};"></div>
+                    <div style="width: 1px; flex: 1; min-height: 18px; background: #E6EEF8; margin-top: 3px;"></div>
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; line-height: 1.45; color: #24374B;">{{ u.texto }}</div>
+                    <div style="font-size: 11px; color: #5B7185; margin-top: 2px;"><span style="font-family: 'IBM Plex Mono', monospace;">{{ u.data }}</span> · {{ u.meta }}</div>
+                  </div>
+                </div>
+                </sc-for>
+              </div>
+              <button onClick="{{ b.abrir }}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">Abrir medições da BSP →</button>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+  <div style="flex: 1; min-height: 0; overflow-y: auto; background: #F4F8FB;">
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 26px; background: #fff; border-bottom: 1px solid #EDF2F8;">
+      <button onClick="{{ voltar }}" style="height: 32px; padding: 0 14px; border: 1px solid #E1E9F4; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 500; color: #2C3E50; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">← Medições</button>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #93A6B8;">{{ d.crumb }}</div>
+    </div>
+
+    <div style="padding: 20px 22px 28px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="background: linear-gradient(100deg, #EAF3FD 0%, #F7FBFF 58%, #FFFFFF 100%); border: 1px solid #DEEBF8; border-radius: 18px; padding: 18px 20px;">
+        <div style="display: flex; align-items: flex-start; gap: 16px;">
+          <div style="width: 60px; height: 60px; border-radius: 18px; flex: none; background: linear-gradient(140deg, #1E86D8, #0E4AA8); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(14,74,168,.24);">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .1em; color: rgba(255,255,255,.72);">BSP</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #fff;">{{ d.n }}</span>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="font-size: 22px; font-weight: 700; letter-spacing: -.025em; color: #0B2340;">{{ d.nome }}</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 999px; white-space: nowrap; background: {{ d.tint }}; color: {{ d.cor }};"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ d.cor }};"></span>BM {{ d.bm }} · {{ d.status }}</span>
+            </div>
+            <div style="font-size: 13px; color: #5B7185; margin-top: 5px;">{{ d.cliente }} · {{ d.unidade }} · PM {{ d.pm }}</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 14px 18px; margin-top: 16px; padding-top: 15px; border-top: 1px solid #DCEAF8;">
+          <sc-for list="{{ d.faixa }}" as="c" hint-placeholder-count="7">
+          <div style="min-width: 0;">
+            <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8;">{{ c.k }}</div>
+            <div style="font-size: 13px; margin-top: 3px; line-height: 1.35; overflow-wrap: anywhere; color: {{ c.cor }};">{{ c.v }}</div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8; margin-bottom: 10px;">Tipos de medição</div>
+        <div style="display: flex; align-items: stretch; gap: 10px;">
+          <sc-for list="{{ tipos }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.click }}" style="{{ f.style }}">
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; opacity: .6;">{{ f.n }}</span>
+              <span style="font-size: 14px; font-weight: 600; flex: 1; min-width: 0; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ f.nome }}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; flex: none; background: {{ f.badgeBg }}; color: {{ f.badgeCor }};">{{ f.badge }}</span>
+            </div>
+            <div style="font-size: 12px; text-align: left; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: {{ f.metaCor }};">{{ f.meta }}</div>
+            <div style="height: 3px; width: 100%; border-radius: 2px; overflow: hidden; background: {{ f.trilha }};"><div style="height: 3px; border-radius: 2px; width: {{ f.pct }}; background: {{ f.barra }};"></div></div>
+          </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid #E8EEF6; border-radius: 18px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: flex-end; gap: 16px;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1E86D8;">{{ sec.eyebrow }}</div>
+            <div style="font-size: 19px; font-weight: 700; color: #0B2340; letter-spacing: -.02em; margin-top: 4px;">{{ sec.titulo }}</div>
+            <div style="font-size: 12px; color: #5B7185; margin-top: 3px;">{{ sec.sub }}</div>
+          </div>
+          <div style="flex: 1;"></div>
+          <button onClick="{{ sec.gerar }}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 12px; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; box-shadow: 0 6px 16px rgba(14,74,168,.22);" style-hover="background: linear-gradient(100deg, #0B3C8C, #1770BE)">+ {{ sec.gerarLabel }}</button>
+        </div>
+
+        <sc-if value="{{ sec.vazio }}" hint-placeholder-val="{{ false }}">
+        <div style="border: 1px dashed #D5E2F0; border-radius: 14px; padding: 34px 20px; text-align: center;">
+          <div style="font-size: 15px; font-weight: 700; color: #0B2340;">Nenhuma medição deste tipo nesta BSP</div>
+          <div style="font-size: 13px; color: #5B7185; margin-top: 6px;">Use o botão acima para gerar a primeira.</div>
+        </div>
+        </sc-if>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ itens }}" as="x" hint-placeholder-count="4">
+          <div style="background: linear-gradient(100deg, #F6FAFF 0%, #FFFFFF 44%); border: 1px solid #E6EEF8; border-radius: 16px;" style-hover="border-color: #CFE0F3; box-shadow: 0 8px 22px rgba(14,74,168,.08);">
+            <div onClick="{{ x.toggle }}" style="display: flex; align-items: center; gap: 16px; padding: 13px 16px; cursor: pointer;">
+              <div style="width: 48px; height: 48px; border-radius: 15px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; background: {{ x.tileBg }};">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .1em; color: {{ x.tileSub }};">{{ x.tileTop }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: {{ x.tileCor }};">{{ x.tileNum }}</span>
+              </div>
+              <div style="width: 300px; flex: none; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 700; color: #0B2340;">{{ x.titulo }}</div>
+                <div style="font-size: 11px; color: #5B7185; margin-top: 3px;">{{ x.sub }}</div>
+              </div>
+              <div style="flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; min-width: 0;">
+                <sc-for list="{{ x.campos }}" as="c" hint-placeholder-count="4">
+                <div style="min-width: 0;">
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8;">{{ c.k }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #24374B; margin-top: 3px; overflow-wrap: anywhere;">{{ c.v }}</div>
+                </div>
+                </sc-for>
+              </div>
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 999px; white-space: nowrap; background: {{ x.tint }}; color: {{ x.cor }};"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ x.cor }};"></span>{{ x.status }}</span>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: #0B2340; width: 150px; text-align: right;">{{ x.valor }}</div>
+              <div style="width: 30px; height: 30px; border-radius: 50%; flex: none; background: #fff; border: 1px solid #E6EEF8; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #1E86D8;">{{ x.caret }}</div>
+            </div>
+
+            <sc-if value="{{ x.aberto }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 4px 16px 18px 80px; border-top: 1px solid #EDF2F8;">
+
+              <sc-if value="{{ x.isBM }}" hint-placeholder-val="{{ false }}">
+              <div style="display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr) 230px; gap: 28px;">
+                <div>
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8; margin: 14px 0 6px;">Composição</div>
+                  <sc-for list="{{ x.secoes }}" as="s" hint-placeholder-count="7">
+                  <div style="display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid #F1F5F9;">
+                    <span style="font-size: 12px; color: #5B7185;">{{ s.nome }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ s.cor }};">{{ s.valor }}</span>
+                  </div>
+                  </sc-for>
+                  <div style="display: flex; justify-content: space-between; padding: 10px 0 0;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0B2340;">Total</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: #0B2340;">{{ x.valor }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8; margin: 14px 0 10px;">Histórico de status</div>
+                  <sc-for list="{{ x.eventos }}" as="e" hint-placeholder-count="3">
+                  <div style="display: grid; grid-template-columns: 12px minmax(0,1fr); gap: 11px; align-items: start; padding-bottom: 12px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; padding-top: 5px;">
+                      <div style="width: 8px; height: 8px; border-radius: 50%; background: {{ e.cor }};"></div>
+                      <div style="width: 1px; flex: 1; min-height: 18px; background: #E6EEF8; margin-top: 3px;"></div>
+                    </div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 600; color: #0B2340;">{{ e.status }}</div>
+                      <div style="font-size: 11px; color: #5B7185; margin-top: 2px;"><span style="font-family: 'IBM Plex Mono', monospace;">{{ e.data }}</span> · {{ e.autor }}</div>
+                    </div>
+                  </div>
+                  </sc-for>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 9px; padding-top: 14px;">
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8;">Ações</div>
+                  <button onClick="{{ x.avancar }}" style="{{ x.acaoStyle }}">{{ x.acao }}</button>
+                  <button style="height: 36px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Pré-visualizar PDF</button>
+                </div>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ x.isHist }}" hint-placeholder-val="{{ false }}">
+              <div style="border: 1px solid #E8EEF6; border-radius: 14px; overflow: hidden; background: #fff; margin-top: 14px;">
+                <div style="display: grid; grid-template-columns: minmax(180px,1.4fr) repeat(31, minmax(0,1fr)) 46px 46px 112px; align-items: center; padding: 7px 14px; background: #F7FAFD; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #6B7C8F;">
+                  <div>Colaborador</div>
+                  <sc-for list="{{ x.dias }}" as="dd" hint-placeholder-count="31">
+                  <div style="text-align: center; border-radius: 5px; letter-spacing: 0; background: {{ dd.bg }};">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #24374B;">{{ dd.d }}</div>
+                    <div style="font-size: 8px; color: {{ dd.fg }};">{{ dd.w }}</div>
+                  </div>
+                  </sc-for>
+                  <div style="text-align: right;">Emb.</div><div style="text-align: right;">Dobra</div><div style="text-align: right;">Diárias</div>
+                </div>
+                <sc-for list="{{ x.linhas }}" as="r" hint-placeholder-count="5">
+                <div style="display: grid; grid-template-columns: minmax(180px,1.4fr) repeat(31, minmax(0,1fr)) 46px 46px 112px; align-items: center; padding: 5px 14px; border-top: 1px solid #F1F5F9;">
+                  <div style="font-size: 12px; color: #0B2340; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px;">{{ r.nome }} <span style="color: #93A6B8; font-size: 11px;">· {{ r.funcao }}</span></div>
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="31">
+                  <div style="height: 22px; display: flex; align-items: center; justify-content: center; background: {{ c.col }};">
+                    <div style="width: calc(100% - 3px); height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 7px; font-weight: 600; background: {{ c.bg }}; color: {{ c.fg }};">{{ c.t }}</div>
+                  </div>
+                  </sc-for>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: right;">{{ r.emb }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: right;">{{ r.dob }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; text-align: right; color: #0B2340;">{{ r.total }}</div>
+                </div>
+                </sc-for>
+                <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: #F7FAFD; flex-wrap: wrap;">
+                  <sc-for list="{{ legenda }}" as="l" hint-placeholder-count="6">
+                  <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #5B7185;">
+                    <span style="min-width: 22px; height: 18px; padding: 0 3px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 600; background: {{ l.bg }}; color: {{ l.fg }};">{{ l.c }}</span>{{ l.nome }}
+                  </div>
+                  </sc-for>
+                </div>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ x.isFerr }}" hint-placeholder-val="{{ false }}">
+              <div style="border: 1px solid #E8EEF6; border-radius: 14px; overflow: hidden; background: #fff; margin-top: 14px;">
+                <div style="display: grid; grid-template-columns: 96px minmax(0,1fr) 80px 80px 120px 120px 130px; gap: 12px; padding: 8px 14px; background: #F7FAFD; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6B7C8F;">
+                  <div>Código</div><div>Ferramenta</div><div style="text-align: right;">Stby</div><div style="text-align: right;">Uso</div><div style="text-align: right;">Diária stby</div><div style="text-align: right;">Diária op.</div><div style="text-align: right;">Provisão</div>
+                </div>
+                <sc-for list="{{ x.ferr }}" as="t" hint-placeholder-count="3">
+                <div style="display: grid; grid-template-columns: 96px minmax(0,1fr) 80px 80px 120px 120px 130px; gap: 12px; padding: 10px 14px; border-top: 1px solid #F1F5F9; align-items: center;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #1355C2;">{{ t.cod }}</div>
+                  <div style="font-size: 13px; color: #0B2340;">{{ t.nome }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right;">{{ t.s }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right;">{{ t.u }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right; color: #5B7185;">{{ t.ds }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right; color: #5B7185;">{{ t.du }}</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-align: right; color: #0B2340;">{{ t.prov }}</div>
+                </div>
+                </sc-for>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ x.isReemb }}" hint-placeholder-val="{{ false }}">
+              <div style="display: grid; grid-template-columns: minmax(0,1fr) 230px; gap: 28px;">
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-top: 14px;">
+                  <sc-for list="{{ x.detalhes }}" as="q" hint-placeholder-count="6">
+                  <div style="background: #fff; border: 1px solid #E6EEF8; border-radius: 14px; padding: 12px 14px;">
+                    <div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #5B7185;">{{ q.k }}</div>
+                    <div style="font-size: 13px; font-weight: 600; color: #0B2340; margin-top: 3px;">{{ q.v }}</div>
+                  </div>
+                  </sc-for>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 9px; padding-top: 14px;">
+                  <div style="font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #93A6B8;">Ações</div>
+                  <button onClick="{{ x.avancar }}" style="{{ x.acaoStyle }}">{{ x.acao }}</button>
+                  <button style="height: 36px; padding: 0 15px; border: 1px solid #E1E9F4; border-radius: 12px; background: #fff; color: #2C3E50; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #F7FBFF; border-color: #CFE0F3;">Ver comprovante</button>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+            </sc-if>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="flex: none; display: flex; align-items: center; gap: 16px; padding: 8px 26px; background: #F1F5F9; border-top: 1px solid #EDF2F8; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F;">
+    <span>{{ statusBar }}</span>
+    <div style="flex: 1;"></div>
+    <span>Clique no cartão para o resumo · abra a BSP para os tipos de medição</span>
+  </div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const pad = v => String(v).padStart(2, '0');
+const brl = v => 'R$ ' + (Math.round(v * 100) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const perLabel = m0 => '26/' + pad(m0 + 1) + ' – 25/' + pad(m0 + 2);
+
+const FLUXO = ['Rascunho', 'Revisão PM', 'Enviado ao cliente', 'Aprovado', 'Faturado'];
+const ACAO = ['Enviar para revisão', 'Enviar ao cliente', 'Registrar aprovação', 'Emitir NF / faturar', 'Boletim faturado'];
+const RFLUXO = ['Lançado', 'Aprovado', 'Incluído no BM'];
+const RACAO = ['Aprovar reembolso', 'Incluir no próximo BM', 'Já incluído no BM'];
+const ST = {
+  'Rascunho': ['#55677A', '#F1F4F8'], 'Revisão PM': ['#A45F00', '#FFF3E0'], 'Enviado ao cliente': ['#1355C2', '#EAF1FD'],
+  'Aprovado': ['#1B7A55', '#E9F7F1'], 'Faturado': ['#0E4AA8', '#E3EEFC'], 'Fechado': ['#1B7A55', '#E9F7F1'],
+  'Aberto': ['#1355C2', '#EAF1FD'], 'Em aberto': ['#1355C2', '#EAF1FD'], 'Lançado': ['#55677A', '#F1F4F8'], 'Incluído no BM': ['#0E4AA8', '#E3EEFC']
+};
+const SECOES = [['diarias', 'Diárias + over stay'], ['horas', 'Horas extras / noturno'], ['logistica', 'Logística'], ['mob', 'Mob/desmob equipe'], ['habitat', 'Ferramental habitat'], ['rentals', 'Rentals'], ['consumiveis', 'Consumíveis']];
+const CODES = {
+  E: { bg: '#DCEEFD', fg: '#0E4AA8', nome: 'Embarcado' }, P: { bg: '#DDF3E9', fg: '#1B7A55', nome: 'MOB / embarque' },
+  D: { bg: '#FFF0D9', fg: '#A45F00', nome: 'Desembarque' }, HO: { bg: '#ECE7FA', fg: '#5B3FB5', nome: 'Hotel pré-embarque' },
+  EC: { bg: '#FDECEA', fg: '#C43232', nome: 'Embarque cancelado' }, DO: { bg: '#0E4AA8', fg: '#FFFFFF', nome: 'Dobra' }
+};
+
+const BSPS = [
+  { n: '25-481', nome: 'Reparo estrutural do casco', cli: 'Brava Mar', un: 'SS-74 Estrela', pm: 'Aline Rocha', po: '4500790114', poVal: 410000,
+    equipe: [['Ivonei Santana de Brito', 'Soldador', 1332], ['Ronald Santos', 'Caldeireiro', 1332], ['Gustavo Leal', 'Inspetor de solda', 1580]],
+    bms: [['005', 3, 'Faturado', {}], ['006', 4, 'Faturado', { logistica: 1338.12 }], ['007', 5, 'Faturado', {}], ['008', 6, 'Faturado', {}], ['009', 7, 'Enviado ao cliente', { logistica: 2676.24 }]],
+    ferr: [['ICA-051', 'Pega viga 5 t', 27, 60], ['ESM-070', 'Esmerilhadeira 5" Ex 220 V', 22, 48]],
+    reemb: [['18/09/2026', 'Passagem', 'Passagem aérea VIX → MCP', 'Gustavo Leal', 1240, 2], ['04/09/2026', 'Hospedagem', 'Hotel pré-embarque · 1 diária', 'Ivonei Santana de Brito', 380, 2], ['27/09/2026', 'Transporte', 'Táxi base → heliporto', 'Ronald Santos', 186.4, 0]] },
+  { n: '25-687', nome: 'Manutenção de caldeiraria', cli: 'MSI', un: 'CID VITORIA', pm: 'Carla Duarte', po: 'não informada', poVal: 0,
+    equipe: [['Claudio Vieira Geraldo', 'Caldeireiro', 1332], ['Filipe Francisco dos Santos', 'Soldador', 1332], ['Miguel Dantas de Santana J.', 'Caldeireiro', 1332], ['Pedro Oliveira da Silva', 'Soldador', 1332], ['Renan Lira Ferreira', 'Soldador', 1332], ['Renato Fagundes Oliveira', 'Soldador', 1332]],
+    bms: [['012', 3, 'Faturado', {}], ['013', 4, 'Faturado', {}], ['014', 5, 'Faturado', { horas: 1776 }], ['015', 6, 'Aprovado', {}], ['016', 7, 'Rascunho', { horas: 2664 }]],
+    ferr: [['HAB-002', 'Módulo de habitat pressurizado 3×2 m', 1250, 2850], ['EXA-031', 'Exaustor Ex 1.200 m³/h', 210, 490], ['SOL-040', 'Máquina de solda MIG 440 V', 180, 420]],
+    reemb: [['21/09/2026', 'Hospedagem', 'Hotel pré-embarque · 2 diárias', 'Filipe Francisco dos Santos', 760, 1], ['21/09/2026', 'Hospedagem', 'Hotel pré-embarque · 2 diárias', 'Renan Lira Ferreira', 760, 1], ['22/09/2026', 'Alimentação', 'Refeições em trânsito', 'Miguel Dantas de Santana J.', 142.5, 0]] },
+  { n: '25-1032', nome: 'Montagem de skids de processo', cli: 'Atlântica Offshore', un: 'FPSO Aurora', pm: 'Bruno Tavares', po: '4500871223', poVal: 620000,
+    equipe: [['Edson Vieira', 'Encarregado', 1650], ['Cleber Matos', 'Montador', 1332], ['Luan Prates', 'Soldador', 1332], ['Rafael Souto', 'Caldeireiro', 1332]],
+    bms: [['001', 3, 'Faturado', { rentals: 12880 }], ['002', 4, 'Faturado', { rentals: 13910.4, consumiveis: 9200 }], ['003', 5, 'Faturado', { rentals: 13910.4 }], ['004', 6, 'Faturado', { rentals: 14220.48, consumiveis: 11050 }], ['005', 7, 'Enviado ao cliente', { horas: 1100, rentals: 14220.48, consumiveis: 18640.32 }]],
+    ferr: [['SOL-041', 'Retificadora TIG 300 A', 160, 380], ['ICA-050', 'Talha corrente 3 t × 5 m', 45, 95], ['CTN-060', "Container ferramentaria 20'", 115, 115]],
+    reemb: [['10/09/2026', 'Passagem', 'Passagem aérea GIG → VIX', 'Luan Prates', 980, 2], ['24/09/2026', 'Transporte', 'Van equipe base → porto', 'Edson Vieira', 640, 1]] },
+  { n: '26-143-02', nome: 'Parada programada — reparos', cli: 'PERENCO', un: 'CHERNE 2', pm: 'Rafael Marques', po: '123028885', poVal: 349157.96,
+    equipe: [['Delço Carvalho da Silva', 'Supervisor offshore', 1850], ['Jorge Santos', 'Caldeireiro', 1332], ['Raphael Carotta Vicente', 'Supervisor offshore', 1850], ['Ronaldo Cardoso Rodrigues', 'Soldador', 1332], ['Tiago Bittencourt', 'Soldador', 1332], ['Maicon Sergio Bezerra', 'Supervisor offshore', 1850]],
+    bms: [['001', 5, 'Faturado', { consumiveis: 12400 }], ['002', 6, 'Faturado', { rentals: 9200 }], ['003', 7, 'Revisão PM', { consumiveis: 90354.5, rentals: 11960.96 }]],
+    ferr: [['HAB-001', 'Módulo de habitat pressurizado 3×3 m', 1450, 3200], ['HCU-010', 'Painel de controle do habitat (HCU)', 620, 1380], ['GDS-021', 'Detecção de gás 4 canais', 310, 720], ['EXA-030', 'Insuflador Ex 1.500 m³/h', 240, 560]],
+    reemb: [['12/09/2026', 'Hospedagem', 'Hotel pré-embarque · 1 diária', 'Maicon Sergio Bezerra', 420, 1], ['15/09/2026', 'Passagem', 'Passagem aérea SSA → MCP', 'Jorge Santos', 1380, 0]] },
+  { n: '26-205', nome: 'Inspeção e reparo de tanques', cli: 'Oceânica Serviços', un: 'UMS Vega', pm: 'Carla Duarte', po: 'PO-2026-0388', poVal: 280000,
+    equipe: [['Hélio Barros', 'Supervisor offshore', 1850], ['Marcos Pina', 'Soldador', 1332], ['Diego Ramos', 'Caldeireiro', 1332]],
+    bms: [['001', 7, 'Aprovado', {}]],
+    ferr: [['ESM-070', 'Esmerilhadeira 5" Ex 220 V', 22, 48]],
+    reemb: [] }
+];
+
+function histograma(b, m0) {
+  const t0 = Date.UTC(2026, m0, 26), t1 = Date.UTC(2026, m0 + 1, 25);
+  const n = Math.round((t1 - t0) / 86400000) + 1;
+  const seed = b.n.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const dias = [];
+  for (let i = 0; i < 31; i++) {
+    if (i >= n) { dias.push({ d: '', w: '', bg: 'transparent', fg: 'transparent', col: 'transparent' }); continue; }
+    const dt = new Date(t0 + i * 86400000), w = dt.getUTCDay(), fds = w === 0 || w === 6;
+    dias.push({ d: pad(dt.getUTCDate()), w: 'DSTQQSS'[w], bg: fds ? '#EEF4FB' : 'transparent', fg: fds ? '#1E86D8' : '#93A6B8', col: fds ? '#F6F9FD' : 'transparent' });
+  }
+  let total = 0, diasEmb = 0, dobras = 0;
+  const linhas = b.equipe.map(([nome, funcao, rate], i) => {
+    const cod = Array(31).fill('');
+    const put = (k, c) => { if (k >= 0 && k < n) cod[k] = c; };
+    const s0 = (i * 5 + m0 * 3 + seed) % 16;
+    if (i % 3 === 1) put(s0 - 1, 'HO');
+    put(s0, 'P');
+    for (let k = s0 + 1; k <= s0 + 12; k++) put(k, 'E');
+    if (i % 4 === 3) { put(s0 + 11, 'DO'); put(s0 + 12, 'DO'); }
+    put(s0 + 13, 'D');
+    if (s0 + 28 < n) { put(s0 + 28, 'P'); for (let k = s0 + 29; k < n; k++) put(k, 'E'); }
+    if (i % 5 === 4) put((s0 + 20) % n, cod[(s0 + 20) % n] ? cod[(s0 + 20) % n] : 'EC');
+    const emb = cod.filter(c => c === 'E' || c === 'P').length, dob = cod.filter(c => c === 'DO').length, can = cod.filter(c => c === 'EC').length;
+    const tot = emb * rate + dob * rate * 2 + can * rate * 0.5;
+    total += tot; diasEmb += emb; dobras += dob;
+    return { nome, funcao, emb: String(emb), dob: String(dob), total: brl(tot),
+      cells: cod.map((c, k) => c ? { t: c, bg: CODES[c].bg, fg: CODES[c].fg, col: dias[k].col } : { t: '', bg: 'transparent', fg: 'transparent', col: dias[k].col }) };
+  });
+  return { dias, linhas, total, diasEmb, dobras };
+}
+
+function ferramental(b, mi) {
+  const nd = new Date(Date.UTC(2026, mi + 1, 0)).getUTCDate();
+  const seed = b.n.length * 3;
+  let total = 0, ts = 0, tu = 0;
+  const ferr = b.ferr.map(([cod, nome, ds, du], j) => {
+    const u = (j * 7 + mi * 5 + seed) % 18 + 5, s = nd - u;
+    const prov = s * ds + u * du;
+    total += prov; ts += s; tu += u;
+    return { cod, nome, s: s + ' d', u: u + ' d', ds: brl(ds), du: brl(du), prov: brl(prov) };
+  });
+  return { ferr, total, ts, tu, nd };
+}
+
+class Component extends DCLogic {
+  state = { view: 'list', open: null, bsp: '26-143-02', tipo: 'bm', item: null, q: '', pm: 'all', cli: 'all', st: 'all', exc: false, semPo: false, extra: {}, stOv: {} };
+
+  card(on, n, nome, badge, meta, pct, done, click) {
+    return {
+      n, nome, badge, meta, pct: Math.max(0, Math.min(100, pct)) + '%', click,
+      badgeBg: on ? 'rgba(255,255,255,.22)' : (done ? '#E9F7F1' : '#EFF5FD'), badgeCor: on ? '#FFFFFF' : (done ? '#1B7A55' : '#1355C2'),
+      metaCor: on ? 'rgba(255,255,255,.8)' : '#93A6B8', trilha: on ? 'rgba(255,255,255,.28)' : '#E7EFF9', barra: on ? '#FFFFFF' : (done ? '#2FA97C' : '#1E86D8'),
+      style: 'flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding: 14px 15px; border-radius: 16px; cursor: pointer; border: 1px solid ' +
+        (on ? 'transparent' : '#E8EEF6') + '; background: ' + (on ? 'linear-gradient(140deg, #1E86D8, #0E4AA8)' : '#FFFFFF') + '; color: ' + (on ? '#FFFFFF' : '#0B2340') + ';' + (on ? ' box-shadow: 0 8px 20px rgba(14,74,168,.22);' : '')
+    };
+  }
+  chip(on) {
+    return 'height: 34px; padding: 0 15px; border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; border: 1px solid ' +
+      (on ? 'transparent; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; box-shadow: 0 5px 14px rgba(14,74,168,.20);' : '#E8EEF6; background: #fff; color: #2C3E50;');
+  }
+  acaoStyle(ok) {
+    return 'height: 36px; padding: 0 15px; border: 0; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; ' +
+      (ok ? 'cursor: pointer; background: linear-gradient(100deg, #0E4AA8, #1E86D8); color: #fff; box-shadow: 0 6px 16px rgba(14,74,168,.22);' : 'cursor: default; background: #E3EEFC; color: #0E4AA8;');
+  }
+
+  model(b) {
+    const s = this.state, ex = s.extra[b.n] || {};
+    const bms = b.bms.concat(ex.bm || []).map(([num, m0, st, secs]) => {
+      const key = b.n + '-bm-' + num, h = histograma(b, m0);
+      const vals = { diarias: h.total, horas: 0, logistica: 0, mob: 0, habitat: 0, rentals: 0, consumiveis: 0 };
+      Object.keys(secs || {}).forEach(k => { vals[k] = secs[k]; });
+      if (b.ferr.length) vals.habitat = ferramental(b, m0).total * 0.35;
+      const total = Object.keys(vals).reduce((a, k) => a + vals[k], 0);
+      return { key, num, m0, st: s.stOv[key] || st, vals, total };
+    });
+    const cur = bms[bms.length - 1];
+    const emit = bms.slice(0, -1).reduce((a, x) => a + x.total, 0);
+    const medido = emit + cur.total;
+    const saldo = b.poVal ? b.poVal - medido : null;
+    const m0s = []; bms.forEach(x => { if (m0s.indexOf(x.m0) < 0) m0s.push(x.m0); });
+    const lastM = Math.max.apply(null, m0s);
+    if (m0s.indexOf(lastM + 1) < 0) m0s.push(lastM + 1);
+    (ex.hist || []).forEach(m => { if (m0s.indexOf(m) < 0) m0s.push(m); });
+    const hists = m0s.sort((a, c) => a - c).map(m0 => {
+      const bm = bms.find(x => x.m0 === m0);
+      return { key: b.n + '-h-' + m0, m0, bm, st: bm && bm.st !== 'Rascunho' ? 'Fechado' : 'Aberto', h: histograma(b, m0) };
+    });
+    let mis = b.ferr.length ? [7, 8, 9] : [];
+    (ex.ferr || []).forEach(m => { if (mis.indexOf(m) < 0) mis.push(m); });
+    const ferrs = mis.sort((a, c) => a - c).map(mi => ({ key: b.n + '-f-' + mi, mi, st: mi < 9 ? 'Fechado' : 'Em aberto', f: ferramental(b, mi) }));
+    const reembs = b.reemb.concat(ex.reemb || []).map((r, i) => {
+      const key = b.n + '-r-' + i;
+      const idx = s.stOv[key] != null ? s.stOv[key] : r[5];
+      return { key, i, data: r[0], tipo: r[1], desc: r[2], colab: r[3], valor: r[4], idx, st: RFLUXO[idx] };
+    });
+    return { b, bms, cur, emit, medido, saldo, hists, ferrs, reembs };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const all = BSPS.map(b => this.model(b));
+    const vis = all.filter(m => {
+      const b = m.b;
+      return (s.pm === 'all' || b.pm === s.pm) && (s.cli === 'all' || b.cli === s.cli) && (s.st === 'all' || m.cur.st === s.st) &&
+        (!s.exc || (m.saldo != null && m.saldo < 0)) && (!s.semPo || !b.poVal) && (!s.q || b.n.indexOf(s.q) > -1 || b.nome.toLowerCase().indexOf(s.q.toLowerCase()) > -1);
+    });
+    const abrir = (n, tipo) => () => this.setState({ view: 'detail', bsp: n, tipo: tipo || 'bm', item: null });
+
+    const cards = vis.map(m => {
+      const b = m.b, aberta = s.open === b.n;
+      const tot = b.poVal ? Math.max(b.poVal, m.medido) : 1, exc = m.saldo != null && m.saldo < 0;
+      const reembPend = m.reembs.filter(r => r.idx < 2);
+      const histAberto = m.hists.find(h => h.st === 'Aberto') || m.hists[m.hists.length - 1];
+      const ferrUlt = m.ferrs[m.ferrs.length - 1];
+      return {
+        n: b.n, nome: b.nome, bm: m.cur.num, status: m.cur.st, cor: ST[m.cur.st][0], tint: ST[m.cur.st][1],
+        familia: m.bms.length + ' BMs · ' + m.hists.length + ' histogramas · ' + m.reembs.length + ' reembolsos',
+        campos: [
+          { k: 'Cliente', v: b.cli, cor: '#24374B' }, { k: 'Unidade', v: b.un, cor: '#24374B' }, { k: 'PM', v: b.pm, cor: '#24374B' },
+          { k: 'PO', v: b.po, cor: b.poVal ? '#24374B' : '#A45F00' }, { k: 'Valor da PO', v: b.poVal ? brl(b.poVal) : '—', cor: '#24374B' },
+          { k: 'Medido acumulado', v: brl(m.medido), cor: '#0B2340' },
+          { k: 'Saldo', v: m.saldo == null ? '—' : brl(m.saldo), cor: m.saldo == null ? '#93A6B8' : (exc ? '#D93B3B' : '#1B7A55') },
+          { k: 'Período atual', v: perLabel(m.cur.m0), cor: '#24374B' }
+        ],
+        wEmit: b.poVal ? (m.emit / tot * 100) + '%' : '0%', wAtual: b.poVal ? (m.cur.total / tot * 100) + '%' : '0%',
+        barAtual: exc ? '#E05C5C' : 'linear-gradient(100deg, #0E4AA8, #1E86D8)',
+        uso: !b.poVal ? 'PO sem valor — saldo não controlado' : (exc ? 'Excede a PO em ' + brl(-m.saldo) : Math.round(m.medido / b.poVal * 100) + '% da PO medida'),
+        usoCor: !b.poVal ? '#A45F00' : (exc ? '#D93B3B' : '#5B7185'),
+        aberta, caret: aberta ? '▼' : '▶',
+        toggle: () => this.setState(st => ({ open: st.open === b.n ? null : b.n })),
+        abrir: abrir(b.n),
+        resumo: [
+          { n: '01', nome: 'Boletim de medição', badge: m.bms.length + ' BMs', valor: brl(m.cur.total), meta: 'BM ' + m.cur.num + ' · ' + m.cur.st, click: abrir(b.n, 'bm') },
+          { n: '02', nome: 'Histograma de embarque', badge: m.hists.length + ' períodos', valor: histAberto.h.diasEmb + ' dias', meta: b.equipe.length + ' pessoas · ' + perLabel(histAberto.m0) + ' ' + histAberto.st.toLowerCase(), click: abrir(b.n, 'hist') },
+          { n: '03', nome: 'Ferramental habitat', badge: m.ferrs.length + ' meses', valor: ferrUlt ? brl(ferrUlt.f.total) : '—', meta: ferrUlt ? b.ferr.length + ' ferramentas · ' + MES[ferrUlt.mi] + ' ' + ferrUlt.st.toLowerCase() : 'sem ferramental', click: abrir(b.n, 'ferr') },
+          { n: '04', nome: 'Reembolsáveis', badge: m.reembs.length + ' itens', valor: brl(reembPend.reduce((a, r) => a + r.valor, 0)), meta: reembPend.length + ' pendentes de inclusão no BM', click: abrir(b.n, 'reemb') }
+        ],
+        eventos: [
+          { data: '23/09', texto: 'BM ' + m.cur.num + ' em ' + m.cur.st + ' — ' + brl(m.cur.total) + '.', meta: 'Boletim de medição', cor: ST[m.cur.st][0] },
+          { data: '25/09', texto: 'Histograma ' + perLabel(m.cur.m0) + ' fechado com ' + histograma(b, m.cur.m0).diasEmb + ' dias embarcados.', meta: 'Histograma de embarque', cor: '#1B7A55' }
+        ].concat(ferrUlt ? [{ data: '01/10', texto: 'Ferramental de ' + MES[ferrUlt.mi] + ' aberto com provisão de ' + brl(ferrUlt.f.total) + '.', meta: 'Ferramental habitat', cor: '#1E86D8' }] : [])
+          .concat(m.reembs.length ? [{ data: m.reembs[m.reembs.length - 1].data.slice(0, 5), texto: m.reembs[m.reembs.length - 1].desc + ' — ' + brl(m.reembs[m.reembs.length - 1].valor) + '.', meta: 'Reembolsáveis · ' + m.reembs[m.reembs.length - 1].st, cor: '#93A6B8' }] : [])
+      };
+    });
+
+    const kpis = [
+      { k: 'BSPs em medição', v: String(all.length), cor: '#0B2340' },
+      { k: 'Valor em medição', v: brl(all.reduce((a, m) => a + m.cur.total, 0)), cor: '#0B2340' },
+      { k: 'Aguardando PM/cliente', v: String(all.filter(m => m.cur.st === 'Revisão PM' || m.cur.st === 'Enviado ao cliente').length), cor: '#A45F00' },
+      { k: 'Saldo excedido', v: String(all.filter(m => m.saldo != null && m.saldo < 0).length), cor: '#D93B3B' }
+    ];
+    const uniq = k => { const o = []; BSPS.forEach(b => { if (o.indexOf(b[k]) < 0) o.push(b[k]); }); return o.sort(); };
+
+    // detalhe
+    const m = all.find(x => x.b.n === s.bsp) || all[0], b = m.b;
+    const add = (tipo, val) => this.setState(st => {
+      const ex = Object.assign({}, st.extra[b.n] || {});
+      ex[tipo] = (ex[tipo] || []).concat([val]);
+      return { extra: Object.assign({}, st.extra, { [b.n]: ex }) };
+    });
+    const tog = key => () => this.setState(st => ({ item: st.item === key ? null : key }));
+    const tile = (atual, top, num) => ({ tileTop: top, tileNum: num, tileBg: atual ? 'linear-gradient(140deg, #1E86D8, #0E4AA8)' : '#EFF5FD', tileCor: atual ? '#FFFFFF' : '#1355C2', tileSub: atual ? 'rgba(255,255,255,.72)' : '#93A6B8' });
+    const base = (key, st) => ({ key, status: st, cor: ST[st][0], tint: ST[st][1], aberto: s.item === key, caret: s.item === key ? '▼' : '▶', toggle: tog(key), isBM: false, isHist: false, isFerr: false, isReemb: false });
+
+    let itens = [], sec = {};
+    if (s.tipo === 'bm') {
+      itens = m.bms.slice().reverse().map((x, i) => {
+        const idx = FLUXO.indexOf(x.st);
+        return Object.assign(base(x.key, x.st), tile(i === 0, 'BM', x.num), {
+          isBM: true, titulo: 'Período ' + perLabel(x.m0), sub: 'Criado 27/' + pad(x.m0 + 2) + '/2026 · S. Alves', valor: brl(x.total),
+          campos: [{ k: 'Diárias', v: brl(x.vals.diarias) }, { k: 'Rentals', v: x.vals.rentals ? brl(x.vals.rentals) : '—' }, { k: 'Consumíveis', v: x.vals.consumiveis ? brl(x.vals.consumiveis) : '—' }, { k: 'Fluxo', v: (idx + 1) + ' de 5 etapas' }],
+          secoes: SECOES.map(([id, nome]) => ({ nome, valor: x.vals[id] ? brl(x.vals[id]) : '—', cor: x.vals[id] ? '#0B2340' : '#93A6B8' })),
+          eventos: FLUXO.slice(0, idx + 1).map((f, k) => ({ status: f, data: ['27/', '28/', '29/', '02/', '05/'][k] + pad(x.m0 + (k < 3 ? 2 : 3)), autor: ['criado por S. Alves', b.pm, 'e-mail ao fiscal', 'aceite do cliente', 'NF emitida'][k], cor: k === idx ? '#1E86D8' : '#3CB88A' })).reverse(),
+          acao: ACAO[idx], acaoStyle: this.acaoStyle(idx < 4),
+          avancar: () => { if (idx < 4) this.setState(st => ({ stOv: Object.assign({}, st.stOv, { [x.key]: FLUXO[idx + 1] }) })); }
+        });
+      });
+      const prox = String(Number(m.cur.num) + 1).padStart(3, '0');
+      sec = { eyebrow: 'Boletim de medição', titulo: 'Boletins gerados', sub: m.bms.length + ' boletins · ' + m.bms.filter(x => x.st === 'Faturado').length + ' faturados · clique para o histórico rápido', gerarLabel: 'Gerar BM ' + prox,
+        gerar: () => { add('bm', [prox, m.cur.m0 + 1, 'Rascunho', {}]); this.setState({ item: b.n + '-bm-' + prox }); } };
+    } else if (s.tipo === 'hist') {
+      itens = m.hists.slice().reverse().map((x, i) => Object.assign(base(x.key, x.st), tile(x.st === 'Aberto', 'PER', MES[x.m0 + 1]), {
+        isHist: true, titulo: 'Período ' + perLabel(x.m0), sub: x.bm ? 'Alimenta o BM ' + x.bm.num : 'Sem BM gerado ainda', valor: brl(x.h.total),
+        campos: [{ k: 'Pessoas', v: String(b.equipe.length) }, { k: 'Dias embarcados', v: String(x.h.diasEmb) }, { k: 'Dobras', v: String(x.h.dobras) }, { k: 'Dias do período', v: String(x.h.dias.filter(d => d.d).length) }],
+        dias: x.h.dias, linhas: x.h.linhas
+      }));
+      const lastM = Math.max.apply(null, m.hists.map(h => h.m0));
+      sec = { eyebrow: 'Histograma de embarque', titulo: 'Histogramas por período', sub: b.equipe.length + ' pessoas na equipe · as diárias de cada período alimentam o BM correspondente', gerarLabel: 'Gerar histograma ' + perLabel(lastM + 1),
+        gerar: () => { add('hist', lastM + 1); this.setState({ item: b.n + '-h-' + (lastM + 1) }); } };
+    } else if (s.tipo === 'ferr') {
+      itens = m.ferrs.slice().reverse().map(x => Object.assign(base(x.key, x.st), tile(x.st === 'Em aberto', 'MÊS', MES[x.mi]), {
+        isFerr: true, titulo: 'Ferramental ' + MES[x.mi] + '/2026', sub: x.f.nd + ' dias · ' + b.ferr.length + ' ferramentas a bordo', valor: brl(x.f.total),
+        campos: [{ k: 'Ferramentas', v: String(b.ferr.length) }, { k: 'Dias standby', v: String(x.f.ts) }, { k: 'Dias uso', v: String(x.f.tu) }, { k: 'Utilização', v: Math.round(x.f.tu / (x.f.ts + x.f.tu) * 100) + '%' }],
+        ferr: x.f.ferr
+      }));
+      const lastMi = m.ferrs.length ? Math.max.apply(null, m.ferrs.map(f => f.mi)) : 8;
+      sec = { eyebrow: 'Ferramental habitat', titulo: 'Provisões de ferramental', sub: b.ferr.length ? b.ferr.length + ' ferramentas desta BSP · diária de standby e de operação' : 'Nenhuma ferramenta embarcada para esta BSP', gerarLabel: 'Gerar ferramental de ' + MES[lastMi + 1],
+        gerar: () => { if (!b.ferr.length) return; add('ferr', lastMi + 1); this.setState({ item: b.n + '-f-' + (lastMi + 1) }); } };
+    } else {
+      itens = m.reembs.slice().reverse().map(x => Object.assign(base(x.key, x.st), tile(x.idx === 0, 'RB', pad(x.i + 1)), {
+        isReemb: true, titulo: x.desc, sub: x.data + ' · ' + x.colab, valor: brl(x.valor),
+        campos: [{ k: 'Tipo', v: x.tipo }, { k: 'Colaborador', v: x.colab.split(' ')[0] }, { k: 'Markup', v: '—' }, { k: 'BM', v: x.idx === 2 ? 'BM ' + m.cur.num : 'próximo' }],
+        detalhes: [{ k: 'Tipo', v: x.tipo }, { k: 'Data', v: x.data }, { k: 'Colaborador', v: x.colab }, { k: 'Valor', v: brl(x.valor) }, { k: 'Comprovante', v: 'Recibo anexado' }, { k: 'Vínculo', v: x.idx === 2 ? 'Incluído no BM ' + m.cur.num : 'Aguardando inclusão' }],
+        acao: RACAO[x.idx], acaoStyle: this.acaoStyle(x.idx < 2),
+        avancar: () => { if (x.idx < 2) this.setState(st => ({ stOv: Object.assign({}, st.stOv, { [x.key]: x.idx + 1 }) })); }
+      }));
+      sec = { eyebrow: 'Reembolsáveis', titulo: 'Reembolsos lançados', sub: m.reembs.length + ' itens · ' + brl(m.reembs.reduce((a, r) => a + r.valor, 0)) + ' no total', gerarLabel: 'Lançar reembolso',
+        gerar: () => { add('reemb', ['02/10/2026', 'Hospedagem', 'Novo reembolso — hotel pré-embarque', b.equipe[0][0], 420, 0]); this.setState({ item: b.n + '-r-' + m.reembs.length }); } };
+    }
+    sec.vazio = itens.length === 0;
+
+    const nFat = m.bms.filter(x => x.st === 'Faturado').length;
+    const hFech = m.hists.filter(x => x.st === 'Fechado').length;
+    const fFech = m.ferrs.filter(x => x.st === 'Fechado').length;
+    const rInc = m.reembs.filter(x => x.idx === 2).length;
+    const tipos = [
+      this.card(s.tipo === 'bm', '01', 'Boletim de medição', m.bms.length + ' BMs', 'BM ' + m.cur.num + ' · ' + m.cur.st, nFat / m.bms.length * 100, nFat === m.bms.length, () => this.setState({ tipo: 'bm', item: null })),
+      this.card(s.tipo === 'hist', '02', 'Histograma de embarque', m.hists.length + ' períodos', b.equipe.length + ' pessoas · ' + (m.hists.length - hFech) + ' em aberto', hFech / m.hists.length * 100, false, () => this.setState({ tipo: 'hist', item: null })),
+      this.card(s.tipo === 'ferr', '03', 'Ferramental habitat', m.ferrs.length + ' meses', b.ferr.length ? b.ferr.length + ' ferramentas a bordo' : 'sem ferramental', m.ferrs.length ? fFech / m.ferrs.length * 100 : 0, false, () => this.setState({ tipo: 'ferr', item: null })),
+      this.card(s.tipo === 'reemb', '04', 'Reembolsáveis', m.reembs.length + ' itens', brl(m.reembs.filter(r => r.idx < 2).reduce((a, r) => a + r.valor, 0)) + ' pendentes', m.reembs.length ? rInc / m.reembs.length * 100 : 0, m.reembs.length > 0 && rInc === m.reembs.length, () => this.setState({ tipo: 'reemb', item: null }))
+    ];
+    const exc = m.saldo != null && m.saldo < 0;
+    const d = {
+      n: b.n, nome: b.nome, cliente: b.cli, unidade: b.un, pm: b.pm, bm: m.cur.num, status: m.cur.st, cor: ST[m.cur.st][0], tint: ST[m.cur.st][1],
+      crumb: 'Área de medição / BSP ' + b.n + ' / ' + ({ bm: 'Boletim de medição', hist: 'Histograma de embarque', ferr: 'Ferramental habitat', reemb: 'Reembolsáveis' })[s.tipo],
+      faixa: [
+        { k: 'PO', v: b.po, cor: b.poVal ? '#24374B' : '#A45F00' }, { k: 'Valor da PO', v: b.poVal ? brl(b.poVal) : '—', cor: '#24374B' },
+        { k: 'BMs emitidos', v: m.emit ? brl(m.emit) : '—', cor: '#24374B' }, { k: 'BM atual', v: brl(m.cur.total), cor: '#0B2340' },
+        { k: 'Saldo', v: m.saldo == null ? '—' : brl(m.saldo), cor: m.saldo == null ? '#93A6B8' : (exc ? '#D93B3B' : '#1B7A55') },
+        { k: 'Período atual', v: perLabel(m.cur.m0), cor: '#24374B' }, { k: 'Equipe', v: b.equipe.length + ' pessoas', cor: '#24374B' }
+      ]
+    };
+
+    return {
+      isList: s.view === 'list', isDetail: s.view === 'detail',
+      kpis, cards, contagem: vis.length + ' de ' + all.length + ' BSPs',
+      fq: s.q, fpm: s.pm, fcli: s.cli, fst: s.st,
+      optPm: [{ v: 'all', t: 'PM: todos' }].concat(uniq('pm').map(v => ({ v, t: v }))),
+      optCli: [{ v: 'all', t: 'Cliente: todos' }].concat(uniq('cli').map(v => ({ v, t: v }))),
+      optSt: [{ v: 'all', t: 'Status do BM: todos' }].concat(FLUXO.map(v => ({ v, t: v }))),
+      onQ: e => this.setState({ q: e.target.value }), onPm: e => this.setState({ pm: e.target.value }),
+      onCli: e => this.setState({ cli: e.target.value }), onSt: e => this.setState({ st: e.target.value }),
+      togExc: () => this.setState(st => ({ exc: !st.exc })), togSemPo: () => this.setState(st => ({ semPo: !st.semPo })),
+      chipExc: this.chip(s.exc), chipSemPo: this.chip(s.semPo),
+      limpar: () => this.setState({ q: '', pm: 'all', cli: 'all', st: 'all', exc: false, semPo: false }),
+      d, tipos, sec, itens, legenda: Object.keys(CODES).map(c => ({ c, nome: CODES[c].nome, bg: CODES[c].bg, fg: CODES[c].fg })),
+      voltar: () => this.setState({ view: 'list', item: null }),
+      statusBar: s.view === 'list' ? 'Área de medição · ' + vis.length + ' BSPs · período 26/08 – 25/09/2026' : 'BSP ' + b.n + ' · BM ' + m.cur.num + ' · ' + m.cur.st
+    };
+  }
+}
+
+</script>
+</body>
+</html>
