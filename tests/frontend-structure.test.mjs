@@ -31,9 +31,12 @@ test('dimensoes e navegacao originais foram preservadas', () => {
 });
 
 
-test('login Supabase protege os dados reais no Pages', async () => {
+test('login da Intranet STEP protege os dados reais no Pages', async () => {
   const bootstrap = await readFile(new URL('../bootstrap-live.js', import.meta.url), 'utf8');
-  assert.match(bootstrap, /grant_type=password/);
-  assert.match(bootstrap, /grant_type=refresh_token/);
+  assert.match(bootstrap, /ops-panel-auth/);
+  assert.match(bootstrap, /medicao-panel-api/);
+  assert.match(bootstrap, /Usuário ou e-mail/);
+  assert.match(bootstrap, /douglas@pcp/);
+  assert.doesNotMatch(bootstrap, /grant_type=password/);
   assert.match(bootstrap, /Authorization: 'Bearer '/);
 });
