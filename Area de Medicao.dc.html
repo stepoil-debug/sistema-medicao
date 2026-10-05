@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script src="./bootstrap-live.js"></script>
 </head>
 <body>
 <x-dc>
@@ -424,12 +425,13 @@ const ST = {
 };
 const SECOES = [['diarias', 'Diárias + over stay'], ['horas', 'Horas extras / noturno'], ['logistica', 'Logística'], ['mob', 'Mob/desmob equipe'], ['habitat', 'Ferramental habitat'], ['rentals', 'Rentals'], ['consumiveis', 'Consumíveis']];
 const CODES = {
+  R: { bg: '#E8EEF6', fg: '#425B73', nome: 'RDO registrado' },
   E: { bg: '#DCEEFD', fg: '#0E4AA8', nome: 'Embarcado' }, P: { bg: '#DDF3E9', fg: '#1B7A55', nome: 'MOB / embarque' },
   D: { bg: '#FFF0D9', fg: '#A45F00', nome: 'Desembarque' }, HO: { bg: '#ECE7FA', fg: '#5B3FB5', nome: 'Hotel pré-embarque' },
   EC: { bg: '#FDECEA', fg: '#C43232', nome: 'Embarque cancelado' }, DO: { bg: '#0E4AA8', fg: '#FFFFFF', nome: 'Dobra' }
 };
 
-const BSPS = [
+const FALLBACK_BSPS = [
   { n: '25-481', nome: 'Reparo estrutural do casco', cli: 'Brava Mar', un: 'SS-74 Estrela', pm: 'Aline Rocha', po: '4500790114', poVal: 410000,
     equipe: [['Ivonei Santana de Brito', 'Soldador', 1332], ['Ronald Santos', 'Caldeireiro', 1332], ['Gustavo Leal', 'Inspetor de solda', 1580]],
     bms: [['005', 3, 'Faturado', {}], ['006', 4, 'Faturado', { logistica: 1338.12 }], ['007', 5, 'Faturado', {}], ['008', 6, 'Faturado', {}], ['009', 7, 'Enviado ao cliente', { logistica: 2676.24 }]],
@@ -456,6 +458,7 @@ const BSPS = [
     ferr: [['ESM-070', 'Esmerilhadeira 5" Ex 220 V', 22, 48]],
     reemb: [] }
 ];
+const BSPS = (window.STEP_LIVE_DATA?.areaBsps?.length ? window.STEP_LIVE_DATA.areaBsps : FALLBACK_BSPS);
 
 function histograma(b, m0) {
   const t0 = Date.UTC(2026, m0, 26), t1 = Date.UTC(2026, m0 + 1, 25);
@@ -467,6 +470,28 @@ function histograma(b, m0) {
     const dt = new Date(t0 + i * 86400000), w = dt.getUTCDay(), fds = w === 0 || w === 6;
     dias.push({ d: pad(dt.getUTCDate()), w: 'DSTQQSS'[w], bg: fds ? '#EEF4FB' : 'transparent', fg: fds ? '#1E86D8' : '#93A6B8', col: fds ? '#F6F9FD' : 'transparent' });
   }
+  if (b.real) {
+    let total = 0, diasEmb = 0, dobras = 0;
+    const rows = Array.isArray(b.realRows) ? b.realRows : [];
+    const linhas = b.equipe.map(([nome, funcao]) => {
+      const cod = Array(31).fill('');
+      rows.filter(r => r.name === nome && r.role === funcao).forEach(r => {
+        const dt = Date.parse(r.workDate + 'T00:00:00Z');
+        const k = Math.round((dt - t0) / 86400000);
+        if (k >= 0 && k < n) cod[k] = 'R';
+      });
+      const reg = cod.filter(c => c === 'R').length;
+      diasEmb += reg;
+      return {
+        nome, funcao, emb: String(reg), dob: '0', total: 'Rate pendente',
+        cells: cod.map((code, k) => code
+          ? { t: code, bg: CODES[code].bg, fg: CODES[code].fg, col: dias[k].col }
+          : { t: '', bg: 'transparent', fg: 'transparent', col: dias[k].col })
+      };
+    });
+    return { dias, linhas, total, diasEmb, dobras };
+  }
+
   let total = 0, diasEmb = 0, dobras = 0;
   const linhas = b.equipe.map(([nome, funcao, rate], i) => {
     const cod = Array(31).fill('');
@@ -527,9 +552,9 @@ class Component extends DCLogic {
     const bms = b.bms.concat(ex.bm || []).map(([num, m0, st, secs]) => {
       const key = b.n + '-bm-' + num, h = histograma(b, m0);
       const vals = { diarias: h.total, horas: 0, logistica: 0, mob: 0, habitat: 0, rentals: 0, consumiveis: 0 };
-      Object.keys(secs || {}).forEach(k => { vals[k] = secs[k]; });
+      Object.keys(secs || {}).forEach(k => { if (Object.prototype.hasOwnProperty.call(vals, k)) vals[k] = secs[k]; });
       if (b.ferr.length) vals.habitat = ferramental(b, m0).total * 0.35;
-      const total = Object.keys(vals).reduce((a, k) => a + vals[k], 0);
+      const total = secs && secs.__total != null ? (Number(secs.__total) || 0) : Object.keys(vals).reduce((a, k) => a + vals[k], 0);
       return { key, num, m0, st: s.stOv[key] || st, vals, total };
     });
     const cur = bms[bms.length - 1];
@@ -575,7 +600,10 @@ class Component extends DCLogic {
         n: b.n, nome: b.nome, bm: m.cur.num, status: m.cur.st, cor: ST[m.cur.st][0], tint: ST[m.cur.st][1],
         familia: m.bms.length + ' BMs · ' + m.hists.length + ' histogramas · ' + m.reembs.length + ' reembolsos',
         campos: [
-          { k: 'Cliente', v: b.cli, cor: '#24374B' }, { k: 'Unidade', v: b.un, cor: '#24374B' }, { k: 'PM', v: b.pm, cor: '#24374B' },
+          { k: 'Cliente', v: b.cli, cor: '#24374B' }, { k: 'Unidade', v: b.un, cor: '#24374B' },
+          { k: 'Regime', v: b.regimeLabel || '—', cor: b.regime === 'CONFLITANTE' ? '#D93B3B' : '#24374B' },
+          { k: 'Vínculo', v: b.linkLabel || '—', cor: b.linkStatus === 'LINKED' ? '#1B7A55' : '#D93B3B' },
+          { k: 'PM', v: b.pm, cor: '#24374B' },
           { k: 'PO', v: b.po, cor: b.poVal ? '#24374B' : '#A45F00' }, { k: 'Valor da PO', v: b.poVal ? brl(b.poVal) : '—', cor: '#24374B' },
           { k: 'Medido acumulado', v: brl(m.medido), cor: '#0B2340' },
           { k: 'Saldo', v: m.saldo == null ? '—' : brl(m.saldo), cor: m.saldo == null ? '#93A6B8' : (exc ? '#D93B3B' : '#1B7A55') },
@@ -596,7 +624,7 @@ class Component extends DCLogic {
         ],
         eventos: [
           { data: '23/09', texto: 'BM ' + m.cur.num + ' em ' + m.cur.st + ' — ' + brl(m.cur.total) + '.', meta: 'Boletim de medição', cor: ST[m.cur.st][0] },
-          { data: '25/09', texto: 'Histograma ' + perLabel(m.cur.m0) + ' fechado com ' + histograma(b, m.cur.m0).diasEmb + ' dias embarcados.', meta: 'Histograma de embarque', cor: '#1B7A55' }
+          { data: '25/09', texto: 'Histograma ' + perLabel(m.cur.m0) + ' fechado com ' + histograma(b, m.cur.m0).diasEmb + (b.real ? ' registros de RDO.' : ' dias embarcados.'), meta: 'Histograma de embarque', cor: '#1B7A55' }
         ].concat(ferrUlt ? [{ data: '01/10', texto: 'Ferramental de ' + MES[ferrUlt.mi] + ' aberto com provisão de ' + brl(ferrUlt.f.total) + '.', meta: 'Ferramental habitat', cor: '#1E86D8' }] : [])
           .concat(m.reembs.length ? [{ data: m.reembs[m.reembs.length - 1].data.slice(0, 5), texto: m.reembs[m.reembs.length - 1].desc + ' — ' + brl(m.reembs[m.reembs.length - 1].valor) + '.', meta: 'Reembolsáveis · ' + m.reembs[m.reembs.length - 1].st, cor: '#93A6B8' }] : [])
       };
@@ -640,7 +668,7 @@ class Component extends DCLogic {
     } else if (s.tipo === 'hist') {
       itens = m.hists.slice().reverse().map((x, i) => Object.assign(base(x.key, x.st), tile(x.st === 'Aberto', 'PER', MES[x.m0 + 1]), {
         isHist: true, titulo: 'Período ' + perLabel(x.m0), sub: x.bm ? 'Alimenta o BM ' + x.bm.num : 'Sem BM gerado ainda', valor: brl(x.h.total),
-        campos: [{ k: 'Pessoas', v: String(b.equipe.length) }, { k: 'Dias embarcados', v: String(x.h.diasEmb) }, { k: 'Dobras', v: String(x.h.dobras) }, { k: 'Dias do período', v: String(x.h.dias.filter(d => d.d).length) }],
+        campos: [{ k: 'Pessoas', v: String(b.equipe.length) }, { k: b.real ? 'Dias com RDO' : 'Dias embarcados', v: String(x.h.diasEmb) }, { k: 'Dobras', v: String(x.h.dobras) }, { k: 'Dias do período', v: String(x.h.dias.filter(d => d.d).length) }],
         dias: x.h.dias, linhas: x.h.linhas
       }));
       const lastM = Math.max.apply(null, m.hists.map(h => h.m0));
