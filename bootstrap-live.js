@@ -1,65 +1,77 @@
 (() => {
   const SUPABASE_URL = 'https://qxmxtbjxkhecqilpnhgq.supabase.co';
-  const PUBLISHABLE_KEY = 'sb_publishable_TiGdrzZ6H7TCjQ8wPaAkzA_cQxVxdvr';
+  const AUTH_URL = SUPABASE_URL + '/functions/v1/ops-panel-auth';
+  const DATA_URL = SUPABASE_URL + '/functions/v1/medicao-panel-api';
   const PERIOD_START = '2026-08-26';
   const PERIOD_END = '2026-09-25';
   const PERIOD_M0 = 7;
-  const SESSION_KEY = 'step_medicao_session_v1';
-
-  const publicHeaders = {
-    apikey: PUBLISHABLE_KEY,
-    'Content-Type': 'application/json'
-  };
+  const SESSION_KEY = 'step_medicao_intranet_session_v1';
 
   function readSession() {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
-    catch (_) { return null; }
+    try {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      if (!session || !session.token) return null;
+      if (session.expiresAt && Date.parse(session.expiresAt) <= Date.now()) {
+        localStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+      return session;
+    } catch (_) {
+      return null;
+    }
   }
+
   function writeSession(session) {
     localStorage.setItem(SESSION_KEY, JSON.stringify({
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-      expires_at: session.expires_at || null,
-      user: session.user ? { id: session.user.id, email: session.user.email } : null
+      token: session.token,
+      expiresAt: session.expiresAt || null,
+      user: session.user || null
     }));
   }
+
   function clearSession() {
     localStorage.removeItem(SESSION_KEY);
   }
 
-  async function authRequest(path, options = {}) {
-    const response = await fetch(SUPABASE_URL + '/auth/v1/' + path, {
-      ...options,
-      headers: { ...publicHeaders, ...(options.headers || {}) }
+  async function postJson(url, body, token) {
+    const response = await fetch(url, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify(body)
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.msg || data.message || data.error_description || ('HTTP ' + response.status));
+    if (!response.ok || data.ok === false) {
+      const error = new Error(data.error || ('HTTP ' + response.status));
+      error.status = response.status;
+      throw error;
+    }
     return data;
   }
 
-  async function verifySession(session) {
-    if (!session?.access_token) return null;
+  async function validateSession(session) {
+    if (!session?.token) return null;
     try {
-      const user = await authRequest('user', { headers: { Authorization: 'Bearer ' + session.access_token } });
-      return { ...session, user };
-    } catch (_) {
-      return null;
-    }
-  }
-
-  async function refreshSession(session) {
-    if (!session?.refresh_token) return null;
-    try {
-      const fresh = await authRequest('token?grant_type=refresh_token', {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: session.refresh_token })
-      });
-      writeSession(fresh);
-      return fresh;
+      const data = await postJson(AUTH_URL, { action: 'session' }, session.token);
+      return { ...session, user: data.user || session.user };
     } catch (_) {
       clearSession();
       return null;
     }
+  }
+
+  async function login(identifier, password) {
+    const data = await postJson(AUTH_URL, { action: 'login', identifier, password });
+    const session = {
+      token: data.token,
+      expiresAt: data.expiresAt || null,
+      user: data.user || null
+    };
+    writeSession(session);
+    return session;
   }
 
   function loginScreen() {
@@ -73,11 +85,11 @@
       root.style.cssText = 'min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#F4F8FB;';
       root.innerHTML = `
         <form id="step-login-form" style="width:100%;max-width:390px;background:#fff;border:1px solid #E1E9F4;border-radius:20px;padding:28px;box-shadow:0 18px 50px rgba(11,35,64,.10)">
-          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1E86D8">STEP · Sistema de Medição</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1E86D8">STEP · SISTEMA DE MEDIÇÃO</div>
           <div style="font-size:26px;font-weight:700;color:#0B2340;margin:8px 0 6px">Acesso restrito</div>
-          <div style="font-size:13px;line-height:1.5;color:#5B7185;margin-bottom:22px">Entre com o usuário autorizado do Supabase para acessar RDO, Timesheet e dados reais de medição.</div>
-          <label style="display:block;font-size:12px;font-weight:600;color:#425B73;margin-bottom:6px">E-mail</label>
-          <input id="step-login-email" type="email" autocomplete="username" required style="width:100%;height:42px;border:1px solid #DCE5EE;border-radius:10px;padding:0 12px;margin-bottom:14px;outline:none">
+          <div style="font-size:13px;line-height:1.5;color:#5B7185;margin-bottom:22px">Use o mesmo usuário e a mesma senha da Intranet STEP.</div>
+          <label style="display:block;font-size:12px;font-weight:600;color:#425B73;margin-bottom:6px">Usuário ou e-mail</label>
+          <input id="step-login-user" type="text" autocomplete="username" required placeholder="ex.: douglas@pcp" style="width:100%;height:42px;border:1px solid #DCE5EE;border-radius:10px;padding:0 12px;margin-bottom:14px;outline:none">
           <label style="display:block;font-size:12px;font-weight:600;color:#425B73;margin-bottom:6px">Senha</label>
           <input id="step-login-password" type="password" autocomplete="current-password" required style="width:100%;height:42px;border:1px solid #DCE5EE;border-radius:10px;padding:0 12px;margin-bottom:16px;outline:none">
           <button id="step-login-submit" type="submit" style="width:100%;height:42px;border:0;border-radius:11px;background:linear-gradient(100deg,#0E4AA8,#1E86D8);color:#fff;font-weight:600;cursor:pointer">Entrar</button>
@@ -88,22 +100,21 @@
       const form = document.getElementById('step-login-form');
       const error = document.getElementById('step-login-error');
       const button = document.getElementById('step-login-submit');
+
       form.addEventListener('submit', async event => {
         event.preventDefault();
         error.textContent = '';
         button.disabled = true;
         button.textContent = 'Entrando…';
         try {
-          const email = document.getElementById('step-login-email').value.trim();
+          const identifier = document.getElementById('step-login-user').value.trim();
           const password = document.getElementById('step-login-password').value;
-          const session = await authRequest('token?grant_type=password', {
-            method: 'POST',
-            body: JSON.stringify({ email, password })
-          });
-          writeSession(session);
+          const session = await login(identifier, password);
           resolve(session);
         } catch (e) {
-          error.textContent = 'Não foi possível entrar: ' + (e.message || String(e));
+          error.textContent = e.status === 429
+            ? 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
+            : (e.message || 'Usuário ou senha inválidos.');
           button.disabled = false;
           button.textContent = 'Entrar';
         }
@@ -112,28 +123,18 @@
   }
 
   async function ensureSession() {
-    let session = readSession();
-    let verified = await verifySession(session);
-    if (verified) return verified;
-    session = await refreshSession(session);
-    verified = await verifySession(session);
-    if (verified) return verified;
+    const stored = readSession();
+    const valid = await validateSession(stored);
+    if (valid) return valid;
     return loginScreen();
   }
 
-  async function get(table, query, accessToken) {
-    const response = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + query, {
-      headers: {
-        apikey: PUBLISHABLE_KEY,
-        Authorization: 'Bearer ' + accessToken
-      }
-    });
-    if (response.status === 401) {
-      clearSession();
-      throw new Error('Sessão expirada. Recarregue a página para entrar novamente.');
-    }
-    if (!response.ok) throw new Error(table + ': HTTP ' + response.status);
-    return response.json();
+  async function loadDashboard(session) {
+    return postJson(DATA_URL, {
+      action: 'dashboard',
+      periodStart: PERIOD_START,
+      periodEnd: PERIOD_END
+    }, session.token);
   }
 
   const n = value => {
@@ -145,12 +146,6 @@
   const key = value => String(value || '').trim().toUpperCase();
   const isoDay = value => Date.parse(value + 'T00:00:00Z');
   const dayIndex = date => Math.round((isoDay(date) - isoDay(PERIOD_START)) / 86400000);
-
-  async function get(table, query) {
-    const response = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?' + query, { headers });
-    if (!response.ok) throw new Error(table + ': HTTP ' + response.status);
-    return response.json();
-  }
 
   function linkRank(status) {
     return ({ UNRESOLVED_BSP: 4, CLIENT_MISMATCH: 3, CONTEXT_CONFLICT: 2, LINKED: 1 })[status] || 0;
@@ -356,6 +351,7 @@
   }
 
 
+
   function loadRuntime() {
     const script = document.createElement('script');
     script.src = './support.js';
@@ -371,26 +367,29 @@
     const originalBody = document.body.innerHTML;
     const session = await ensureSession();
 
-    // O login substitui temporariamente o body; restauramos o layout original antes do runtime.
     if (!document.querySelector('x-dc')) document.body.innerHTML = originalBody;
 
-    const [execution, reconciliation, bms] = await Promise.all([
-      get('medicao_live_execution', 'select=*&work_date=gte.' + PERIOD_START + '&work_date=lte.' + PERIOD_END + '&order=bsp_raw.asc,work_date.asc,employee_name.asc', session.access_token),
-      get('medicao_live_reconciliation', 'select=*&work_date=gte.' + PERIOD_START + '&work_date=lte.' + PERIOD_END + '&order=bsp_raw.asc,work_date.asc,employee_name.asc', session.access_token),
-      get('medicao_live_bms', 'select=*&order=bsp.asc,sent_pm_date.asc', session.access_token)
-    ]);
-
-    window.STEP_LIVE_DATA = buildData(execution, reconciliation, bms);
-    window.STEP_LIVE_SESSION = { email: session.user?.email || null };
-    window.STEP_LOGOUT = () => { clearSession(); location.reload(); };
+    const payload = await loadDashboard(session);
+    window.STEP_LIVE_DATA = buildData(
+      payload.execution || [],
+      payload.reconciliation || [],
+      payload.bms || []
+    );
+    window.STEP_LIVE_SESSION = session.user || payload.user || null;
+    window.STEP_LOGOUT = async () => {
+      try { await postJson(AUTH_URL, { action: 'logout' }, session.token); } catch (_) {}
+      clearSession();
+      location.reload();
+    };
     window.STEP_LIVE_ERROR = null;
     loadRuntime();
   }
 
   start().catch(error => {
     console.error('[STEP live data]', error);
+    if (error && (error.status === 401 || error.status === 403)) clearSession();
     document.body.innerHTML = '<div style="padding:32px;font-family:Arial;color:#8A1C1C"><strong>Falha ao carregar o painel.</strong><br>' +
-      String(error.message || error) + '</div>';
+      String(error.message || error) + '<br><br><button onclick="localStorage.removeItem(\'' + SESSION_KEY + '\');location.reload()">Entrar novamente</button></div>';
     window.STEP_LIVE_ERROR = error.message || String(error);
   });
 })();
