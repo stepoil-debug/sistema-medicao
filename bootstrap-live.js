@@ -161,6 +161,17 @@
     const name = (services.length ? services.join(' + ') : 'Execução operacional') + ' · ' + linkLabel(linkStatus);
     const unitWithRegime = location + ' · ' + regimeLabel(regime);
     const allApproved = rows.length > 0 && rows.every(r => !!r.source_approved);
+    const dateBr = value => value ? value.slice(8,10) + '/' + value.slice(5,7) + '/' + value.slice(0,4) : '—';
+    const bmMeta = {
+      sentPm: currentBm?.sent_pm_date || null,
+      sentPmLabel: dateBr(currentBm?.sent_pm_date),
+      sentClient: currentBm?.sent_client_date || null,
+      sentClientLabel: dateBr(currentBm?.sent_client_date),
+      approval: currentBm?.approval_date || null,
+      approvalLabel: dateBr(currentBm?.approval_date),
+      sentBilling: currentBm?.sent_billing_date || null,
+      sentBillingLabel: dateBr(currentBm?.sent_billing_date)
+    };
 
     return {
       n: bspRaw,
@@ -181,6 +192,7 @@
       linkStatus,
       linkLabel: linkLabel(linkStatus),
       sourceApproved: allApproved,
+      bmMeta,
       pessoas: people.map(p => [p.name, p.role, null, p.spec]),
       equipe: people.map(p => [p.name, p.role, null]),
       horas: people.filter(p => p.overtimeHours > 0).map(p => [p.name, p.role, 'HE', p.otDays, p.overtimeHours, null]),
