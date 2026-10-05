@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #E9EEF4; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #12202E; }
+  * { box-sizing: border-box; }
+  a { color: #1355C2; text-decoration: none; }
+  a:hover { color: #0E4092; text-decoration: underline; }
+  select, input, button { font-family: inherit; font-size: inherit; color: inherit; }
+  ::selection { background: #CFE3FB; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; padding: 28px; display: flex; justify-content: center; background: linear-gradient(180deg, #EDF2F8 0%, #E4EBF3 100%);">
+<div style="width: 100%; max-width: 1560px; background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 10px; box-shadow: 0 1px 2px rgba(18,32,46,.06), 0 22px 60px rgba(14,74,168,.16); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; gap: 16px; padding: 0 16px; height: 54px; background: #FFFFFF; color: #12202E; border-bottom: 1px solid #DCE5EE;">
+    <div style="display: flex; gap: 7px;">
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #E05C5C;"></div>
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #F0B429;"></div>
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: #3CC29A;"></div>
+    </div>
+    <img src="assets/step-logo.png" alt="STEP Integrated Solutions" style="height: 30px; width: auto; display: block; mix-blend-mode: multiply;">
+    <div style="width: 1px; height: 18px; background: #DCE5EE;"></div>
+    <div style="font-size: 13px; font-weight: 500; color: #2C3E50;">Controle de Projetos — Alocação de BSPs</div>
+    <div style="flex: 1;"></div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7E93A8;">{{ relogio }}</div>
+    <div style="display: flex; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid #DCE5EE;">
+      <div style="width: 24px; height: 24px; border-radius: 50%; background: #1355C2; color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">RM</div>
+      <span style="font-size: 12px; color: #55677A;">R. Marques</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+  <div style="display: flex; align-items: stretch;">
+    <aside style="width: 258px; flex: none; background: #F8FAFC; border-right: 1px solid #DCE5EE; padding: 20px 18px; display: flex; flex-direction: column; gap: 22px;">
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 10px;">Carteira</div>
+        <div style="display: flex; flex-direction: column; gap: 1px; background: #DCE5EE; border: 1px solid #DCE5EE; border-radius: 6px; overflow: hidden;">
+          <div style="background: #fff; padding: 10px 12px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 12px; color: #55677A;">Em carteira</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600;">{{ kpiTotal }}</span></div>
+          <div style="background: #fff; padding: 10px 12px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 12px; color: #55677A;">Atrasadas</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: #D93B3B;">{{ kpiAtraso }}</span></div>
+          <div style="background: #fff; padding: 10px 12px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 12px; color: #55677A;">Avanço médio</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600;">{{ kpiAvanco }}</span></div>
+          <div style="background: #fff; padding: 10px 12px; display: flex; align-items: baseline; justify-content: space-between;"><span style="font-size: 12px; color: #55677A;">Orçado</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600;">{{ kpiValor }}</span></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 9px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F;">Filtros</div>
+        <div style="display: flex; align-items: center; gap: 7px; background: #fff; border: 1px solid #C9D5E2; border-radius: 5px; padding: 0 9px; height: 32px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B7C8F;">Nº</span>
+          <input value="{{ fBusca }}" onChange="{{ onBusca }}" placeholder="buscar 0142…" style="border: 0; outline: 0; flex: 1; min-width: 0; font-size: 12px; background: transparent; font-family: 'IBM Plex Mono', monospace;">
+        </div>
+        <select value="{{ fPm }}" onChange="{{ onPm }}" style="width: 100%; height: 32px; padding: 0 9px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px;"><sc-for list="{{ optsPm }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select>
+        <select value="{{ fCliente }}" onChange="{{ onCliente }}" style="width: 100%; height: 32px; padding: 0 9px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px;"><sc-for list="{{ optsCliente }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select>
+        <select value="{{ fStatus }}" onChange="{{ onStatus }}" style="width: 100%; height: 32px; padding: 0 9px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px;"><sc-for list="{{ optsStatus }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select>
+        <select value="{{ fStep }}" onChange="{{ onStep }}" style="width: 100%; height: 32px; padding: 0 9px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px;"><sc-for list="{{ optsStep }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select>
+        <select value="{{ fPeriodo }}" onChange="{{ onPeriodo }}" style="width: 100%; height: 32px; padding: 0 9px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px;"><sc-for list="{{ optsPeriodo }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select>
+        <div style="display: flex; gap: 7px; flex-wrap: wrap;">
+          <button onClick="{{ toggleAtraso }}" style="{{ chipAtraso }}">Só atrasadas</button>
+          <button onClick="{{ togglePrio }}" style="{{ chipPrio }}">Prioridade</button>
+        </div>
+        <button onClick="{{ limpar }}" style="height: 30px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #55677A; font-size: 12px; cursor: pointer; text-align: left;" style-hover="background: #EAF1F8; color: #12202E;">Limpar filtros</button>
+      </div>
+      <div style="flex: 1; min-height: 20px;"></div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7E93A8; border-top: 1px solid #DCE5EE; padding-top: 12px;">{{ contagem }}</div>
+    </aside>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: flex-end; gap: 20px; padding: 20px 24px 16px; border-bottom: 1px solid #DCE5EE;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 6px;">Visão geral</div>
+          <div style="font-size: 24px; font-weight: 600; letter-spacing: -.02em;">Carteira de BSPs</div>
+        </div>
+        <div style="flex: 1;"></div>
+        <div style="display: flex; border: 1px solid #C9D5E2; border-radius: 5px; overflow: hidden; background: #fff;">
+          <button onClick="{{ setTable }}" style="{{ tabBtnA }}">Tabela</button>
+          <button onClick="{{ setBoard }}" style="{{ tabBtnB }}">Quadros por cliente</button>
+        </div>
+      </div>
+      <sc-if value="{{ isTable }}" hint-placeholder-val="{{ true }}">
+    <div style="overflow-x: auto;">
+      <div style="min-width: 1240px; display: grid; grid-template-columns: 78px minmax(0,2.2fr) minmax(0,1.1fr) 116px 128px 142px 96px 112px 108px; gap: 14px; padding: 9px 26px; background: #E3EAF2; border-bottom: 1px solid #BFD0E0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #55677A;">
+        <div>Nº</div><div>Projeto</div><div>Cliente</div><div>PM</div><div>Etapa atual</div><div>Avanço</div><div>Prazo</div><div>Orçamento</div><div>Atualizado</div>
+      </div>
+      <div style="min-width: 1240px; max-height: 560px; overflow-y: auto;">
+        <sc-for list="{{ rows }}" as="row" hint-placeholder-count="8">
+        <div style="border-bottom: 1px solid #E6ECF3; background: #FFFFFF;">
+          <div onClick="{{ row.toggle }}" style="display: grid; grid-template-columns: 78px minmax(0,2.2fr) minmax(0,1.1fr) 116px 128px 142px 96px 112px 108px; gap: 14px; padding: 13px 26px; align-items: center; cursor: pointer;" style-hover="background: #F7FAFD;">
+            <div style="display: flex; align-items: center; gap: 7px;">
+              <span style="font-size: 9px; color: #8497A8; width: 8px;">{{ row.caret }}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;">{{ row.numero }}</span>
+            </div>
+            <div style="min-width: 0;">
+              <div style="font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ row.nome }}</div>
+              <div style="font-size: 11px; color: #6B7C8F;">{{ row.familia }}</div>
+            </div>
+            <div style="font-size: 13px; color: #2C3E50; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ row.cliente }}</div>
+            <div style="display: flex; align-items: center; gap: 7px;">
+              <div style="width: 22px; height: 22px; border-radius: 50%; background: #E3EAF2; color: #3A4C5E; font-size: 9px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none;">{{ row.pmIni }}</div>
+              <span style="font-size: 12px; color: #2C3E50; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ row.pm }}</span>
+            </div>
+            <div style="display: flex;"><span style="font-size: 11px; padding: 3px 8px; border-radius: 3px; border: 1px solid; white-space: nowrap; border-color: {{ row.cor }}; color: {{ row.cor }};">{{ row.status }}</span></div>
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <div style="flex: 1; height: 5px; background: #E3EAF2; border-radius: 3px; overflow: hidden;"><div style="height: 5px; border-radius: 3px; width: {{ row.pctW }}; background: {{ row.cor }};"></div></div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; width: 34px; text-align: right;">{{ row.pctT }}</span>
+            </div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ row.corPrazo }};">{{ row.prazo }}</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #2C3E50;">{{ row.valor }}</div>
+            <div style="font-size: 11px; color: #6B7C8F;">{{ row.ultima }}</div>
+          </div>
+
+          <sc-if value="{{ row.aberta }}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 34px; padding: 4px 26px 22px 111px; background: #F7FAFD; border-top: 1px dashed #DCE5EE;">
+            <div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin: 16px 0 12px;">Últimas atualizações</div>
+              <div style="display: flex; flex-direction: column; gap: 0;">
+                <sc-for list="{{ row.updates }}" as="u" hint-placeholder-count="3">
+                <div style="display: grid; grid-template-columns: 92px 12px minmax(0,1fr); gap: 12px; align-items: start; padding-bottom: 14px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F; padding-top: 2px;">{{ u.data }}</div>
+                  <div style="display: flex; flex-direction: column; align-items: center; padding-top: 5px;">
+                    <div style="width: 7px; height: 7px; border-radius: 50%; background: {{ u.cor }};"></div>
+                    <div style="width: 1px; flex: 1; min-height: 20px; background: #DCE5EE; margin-top: 3px;"></div>
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; line-height: 1.45;">{{ u.texto }}</div>
+                    <div style="font-size: 11px; color: #6B7C8F; margin-top: 3px;">{{ u.autor }} · {{ u.tipo }}</div>
+                  </div>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="padding-top: 16px;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Resumo rápido</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #DCE5EE; border: 1px solid #DCE5EE; border-radius: 5px; overflow: hidden;">
+                <div style="background: #fff; padding: 11px 13px;"><div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #6B7C8F;">Steps concluídos</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600;">{{ row.stepsFeitos }}</div></div>
+                <div style="background: #fff; padding: 11px 13px;"><div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #6B7C8F;">Lançamentos</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600;">{{ row.qtdLanc }}</div></div>
+                <div style="background: #fff; padding: 11px 13px;"><div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #6B7C8F;">Realizado</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600;">{{ row.realizado }}</div></div>
+                <div style="background: #fff; padding: 11px 13px;"><div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #6B7C8F;">Equipe</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600;">{{ row.qtdEquipe }}</div></div>
+              </div>
+              <div style="display: flex; gap: 9px; margin-top: 14px;">
+                <button onClick="{{ row.abrir }}" style="height: 34px; padding: 0 16px; border: 0; border-radius: 5px; background: #1355C2; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;" style-hover="background: #0E4092;">Abrir arquivo do projeto →</button>
+                <button style="height: 34px; padding: 0 14px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 13px; cursor: pointer;" style-hover="background: #EAF1F8;">Novo lançamento</button>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+    <div style="padding: 22px 26px 30px; display: flex; flex-direction: column; gap: 26px; max-height: 620px; overflow-y: auto;">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <div style="font-size: 15px; font-weight: 600;">{{ g.cliente }}</div>
+          <div style="flex: 1; height: 1px; background: #DCE5EE;"></div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F;">{{ g.resumo }}</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
+          <sc-for list="{{ g.items }}" as="row" hint-placeholder-count="3">
+          <div onClick="{{ row.abrir }}" style="background: #fff; border: 1px solid #DCE5EE; border-radius: 6px; padding: 14px 15px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #1355C2; box-shadow: 0 6px 18px rgba(14,74,168,.14);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;">{{ row.numero }}</span>
+              <span style="font-size: 10px; padding: 2px 7px; border-radius: 3px; border: 1px solid; white-space: nowrap; border-color: {{ row.cor }}; color: {{ row.cor }};">{{ row.status }}</span>
+            </div>
+            <div style="font-size: 14px; font-weight: 500; line-height: 1.35;">{{ row.nome }}</div>
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <div style="flex: 1; height: 5px; background: #F1F5F9; border-radius: 3px; overflow: hidden;"><div style="height: 5px; border-radius: 3px; width: {{ row.pctW }}; background: {{ row.cor }};"></div></div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">{{ row.pctT }}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #6B7C8F; border-top: 1px solid #F1F5F9; padding-top: 9px;">
+              <span>{{ row.pm }}</span><span style="font-family: 'IBM Plex Mono', monospace;">{{ row.prazo }}</span>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-for>
+    </div>
+    </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 11px 26px; background: #F1F5F9; border-bottom: 1px solid #DCE5EE;">
+      <button onClick="{{ voltar }}" style="height: 30px; padding: 0 12px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 12px; cursor: pointer; white-space: nowrap; flex: none;" style-hover="background: #EAF1F8;">← Carteira</button>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B7C8F;">{{ d.breadcrumb }}</div>
+    </div>
+
+    <div style="display: flex; align-items: flex-start; gap: 24px; padding: 24px 26px 20px; border-bottom: 1px solid #DCE5EE;">
+      <div style="min-width: 0; flex: 1;">
+        <div style="display: flex; align-items: center; gap: 11px; margin-bottom: 7px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; background: linear-gradient(95deg, #0E4AA8, #1E86D8); color: #fff; padding: 4px 9px; border-radius: 4px; letter-spacing: .04em;">{{ d.numero }}</span>
+          <span style="font-size: 11px; padding: 3px 9px; border-radius: 3px; border: 1px solid; white-space: nowrap; border-color: {{ d.cor }}; color: {{ d.cor }};">{{ d.status }}</span>
+          <span style="font-size: 12px; color: #6B7C8F;">Etapa atual: {{ d.step }}</span>
+        </div>
+        <div style="font-size: 26px; font-weight: 600; letter-spacing: -.02em; margin-bottom: 6px;">{{ d.nome }}</div>
+        <div style="font-size: 13px; color: #55677A;">{{ d.cliente }} · PM {{ d.pm }} · última atualização {{ d.ultima }}</div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div style="text-align: right; padding-right: 14px; border-right: 1px solid #DCE5EE;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600;">{{ d.pctT }}</div>
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #6B7C8F;">Avanço físico</div>
+        </div>
+        <button style="height: 36px; padding: 0 16px; border: 0; border-radius: 5px; background: #1355C2; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;" style-hover="background: #0E4092;">+ Lançamento</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap: 0; align-items: start;">
+      <div style="padding: 22px 26px 34px; display: flex; flex-direction: column; gap: 28px; border-right: 1px solid #DCE5EE;">
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Steps / cronograma</div>
+          <div style="display: flex; flex-direction: column; gap: 1px; background: #DCE5EE; border: 1px solid #DCE5EE; border-radius: 5px; overflow: hidden;">
+            <sc-for list="{{ d.steps }}" as="s" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 26px minmax(0,1fr) 104px; gap: 12px; align-items: center; background: #fff; padding: 11px 13px;">
+              <div style="width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: #fff; background: {{ s.cor }};">{{ s.n }}</div>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; font-weight: 500; overflow-wrap: anywhere;">{{ s.nome }}</div>
+                <div style="font-size: 11px; color: #6B7C8F; margin-top: 2px;"><span style="font-family: 'IBM Plex Mono', monospace;">{{ s.janela }}</span> · {{ s.resp }}</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="flex: 1; height: 4px; background: #F1F5F9; border-radius: 2px; overflow: hidden;"><div style="height: 4px; width: {{ s.pctW }}; background: {{ s.cor }};"></div></div>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #55677A; width: 32px; text-align: right;">{{ s.pctT }}</span>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Linha do tempo de avanços</div>
+          <div>
+            <sc-for list="{{ d.timeline }}" as="u" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 96px 12px minmax(0,1fr); gap: 12px; align-items: start; padding-bottom: 16px;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F; padding-top: 2px;">{{ u.data }}</div>
+              <div style="display: flex; flex-direction: column; align-items: center; padding-top: 5px;">
+                <div style="width: 7px; height: 7px; border-radius: 50%; background: {{ u.cor }};"></div>
+                <div style="width: 1px; flex: 1; min-height: 24px; background: #DCE5EE; margin-top: 3px;"></div>
+              </div>
+              <div>
+                <div style="font-size: 13px; line-height: 1.5;">{{ u.texto }}</div>
+                <div style="font-size: 11px; color: #6B7C8F; margin-top: 3px;">{{ u.autor }} · {{ u.tipo }} · {{ u.step }}</div>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F;">Lançamentos</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #55677A;">Saldo {{ d.saldo }}</div>
+          </div>
+          <div style="border: 1px solid #DCE5EE; border-radius: 5px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 78px minmax(0,1fr) 92px; gap: 12px; padding: 8px 13px; background: #F1F5F9; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #55677A;">
+              <div>Data</div><div>Descrição</div><div style="text-align: right;">Valor</div>
+            </div>
+            <sc-for list="{{ d.lancamentos }}" as="l" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: 78px minmax(0,1fr) 92px; gap: 12px; padding: 10px 13px; background: #fff; border-top: 1px solid #F1F5F9; align-items: center;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F;">{{ l.data }}</div>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; line-height: 1.4;">{{ l.desc }}</div>
+                <div style="font-size: 11px; color: #6B7C8F; margin-top: 2px;">{{ l.tipo }}</div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-align: right; white-space: nowrap; color: {{ l.cor }};">{{ l.valor }}</div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Comentários</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ d.comentarios }}" as="c" hint-placeholder-count="2">
+            <div style="display: flex; gap: 11px;">
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: #E3EAF2; color: #3A4C5E; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none;">{{ c.ini }}</div>
+              <div style="background: #fff; border: 1px solid #DCE5EE; border-radius: 5px; padding: 10px 12px; flex: 1;">
+                <div style="display: flex; gap: 9px; align-items: baseline; margin-bottom: 4px;">
+                  <span style="font-size: 12px; font-weight: 600;">{{ c.autor }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6B7C8F;">{{ c.data }}</span>
+                </div>
+                <div style="font-size: 13px; line-height: 1.5; color: #2C3E50;">{{ c.texto }}</div>
+              </div>
+            </div>
+            </sc-for>
+            <div style="display: flex; gap: 9px;">
+              <input placeholder="Escrever um comentário…" style="flex: 1; height: 34px; padding: 0 11px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 13px;">
+              <button style="height: 34px; padding: 0 14px; border: 1px solid #C9D5E2; border-radius: 5px; background: #fff; font-size: 13px; cursor: pointer;" style-hover="background: #EAF1F8;">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 22px 26px 34px; display: flex; flex-direction: column; gap: 26px; background: #F8FAFC;">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Avanço planejado × real</div>
+          <div style="background: #fff; border: 1px solid #DCE5EE; border-radius: 5px; padding: 14px;">
+            <div style="display: flex; align-items: flex-end; gap: 8px; height: 118px;">
+              <sc-for list="{{ d.grafico }}" as="b" hint-placeholder-count="6">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end;">
+                <div style="display: flex; align-items: flex-end; gap: 3px; width: 100%; justify-content: center; flex: 1;">
+                  <div style="width: 9px; background: #BFD0E0; border-radius: 2px 2px 0 0; height: {{ b.planH }};"></div>
+                  <div style="width: 9px; background: #1355C2; border-radius: 2px 2px 0 0; height: {{ b.realH }};"></div>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6B7C8F;">{{ b.mes }}</div>
+              </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 14px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F1F5F9; font-size: 11px; color: #55677A;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #BFD0E0; border-radius: 2px;"></span>Planejado</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #1355C2; border-radius: 2px;"></span>Real</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Dados do cliente</div>
+          <div style="background: #fff; border: 1px solid #DCE5EE; border-radius: 5px; overflow: hidden;">
+            <sc-for list="{{ d.clienteInfo }}" as="f" hint-placeholder-count="5">
+            <div style="display: flex; justify-content: space-between; gap: 14px; padding: 9px 13px; border-bottom: 1px solid #EAF1F8;">
+              <span style="font-size: 12px; color: #6B7C8F;">{{ f.k }}</span>
+              <span style="font-size: 12px; text-align: right; font-family: 'IBM Plex Mono', monospace;">{{ f.v }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Equipe e responsáveis</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{ d.equipe }}" as="p" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #DCE5EE; border-radius: 5px; padding: 9px 11px;">
+              <div style="width: 26px; height: 26px; border-radius: 50%; background: #E3EAF2; color: #3A4C5E; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">{{ p.ini }}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 500;">{{ p.nome }}</div>
+                <div style="font-size: 11px; color: #6B7C8F;">{{ p.papel }}</div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #55677A;">{{ p.aloc }}</div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #6B7C8F; margin-bottom: 12px;">Documentos e anexos</div>
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <sc-for list="{{ d.docs }}" as="doc" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 11px; background: #fff; border: 1px solid #DCE5EE; border-radius: 5px; padding: 9px 11px; cursor: pointer;" style-hover="border-color: #1355C2;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; padding: 3px 5px; border-radius: 2px; background: #F1F5F9; color: #55677A;">{{ doc.ext }}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ doc.nome }}</div>
+                <div style="font-size: 10px; color: #6B7C8F;">{{ doc.meta }}</div>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="display: flex; align-items: center; gap: 16px; padding: 8px 26px; background: #F1F5F9; border-top: 1px solid #DCE5EE; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7C8F;">
+    <span>{{ statusBar }}</span>
+    <div style="flex: 1;"></div>
+    <span>Clique na linha para expandir · duplo nível: família → arquivo do projeto</span>
+  </div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;modoInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tabela&quot;,&quot;quadros&quot;],&quot;default&quot;:&quot;tabela&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Visão geral&quot;},&quot;ordem&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;asc&quot;,&quot;desc&quot;],&quot;default&quot;:&quot;asc&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Visão geral&quot;},&quot;mostrarValores&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Visão geral&quot;}}">
+const COR = { exec: '#17A9E8', ok: '#0F8A6A', atraso: '#D93B3B', plan: '#55677A', rev: '#1355C2' };
+const STCOR = { 'Em execução': COR.exec, 'Concluído': COR.ok, 'Atrasado': COR.atraso, 'Planejamento': COR.plan, 'Em revisão': COR.rev };
+
+const P = [
+  { n: '0118', nome: 'Reforma da subestação SE-04', fam: '3 frentes · 12 steps', cli: 'Vale Norte Mineração', pm: 'Rafael Marques', st: 'Concluído', pct: 100, prazo: '12/03/26', valor: 1840000, ult: 'há 6 dias', step: 'Encerramento', prio: false },
+  { n: '0124', nome: 'Ampliação da linha de envase 2', fam: '4 frentes · 16 steps', cli: 'Bebidas Serrana', pm: 'Carla Duarte', st: 'Em execução', pct: 72, prazo: '28/09/26', valor: 3260000, ult: 'hoje, 09:12', step: 'Montagem mecânica', prio: true },
+  { n: '0129', nome: 'Automação do pátio de sucata', fam: '2 frentes · 9 steps', cli: 'Siderúrgica Atlas', pm: 'Bruno Tavares', st: 'Atrasado', pct: 41, prazo: '05/09/26', valor: 980000, ult: 'ontem, 17:40', step: 'Comissionamento', prio: true },
+  { n: '0133', nome: 'Retrofit de painéis CCM-A', fam: '3 frentes · 11 steps', cli: 'Vale Norte Mineração', pm: 'Carla Duarte', st: 'Em execução', pct: 58, prazo: '14/11/26', valor: 1420000, ult: 'hoje, 08:05', step: 'Fabricação', prio: false },
+  { n: '0136', nome: 'Rede de incêndio — galpão 7', fam: '2 frentes · 8 steps', cli: 'Log Center Paulínia', pm: 'Aline Rocha', st: 'Em revisão', pct: 34, prazo: '30/10/26', valor: 640000, ult: 'há 2 dias', step: 'Projeto executivo', prio: false },
+  { n: '0140', nome: 'Subestação abrigada 13,8 kV', fam: '5 frentes · 18 steps', cli: 'Siderúrgica Atlas', pm: 'Rafael Marques', st: 'Em execução', pct: 66, prazo: '19/12/26', valor: 4750000, ult: 'hoje, 11:30', step: 'Obra civil', prio: true },
+  { n: '0142', nome: 'Instrumentação da caldeira CB-2', fam: '3 frentes · 14 steps', cli: 'Bebidas Serrana', pm: 'Bruno Tavares', st: 'Em execução', pct: 49, prazo: '07/11/26', valor: 2180000, ult: 'há 3 dias', step: 'Suprimentos', prio: false },
+  { n: '0147', nome: 'Esteira transportadora TC-11', fam: '2 frentes · 10 steps', cli: 'Vale Norte Mineração', pm: 'Aline Rocha', st: 'Atrasado', pct: 28, prazo: '22/08/26', valor: 1130000, ult: 'há 8 dias', step: 'Fabricação', prio: false },
+  { n: '0151', nome: 'Climatização da sala elétrica', fam: '1 frente · 6 steps', cli: 'Log Center Paulínia', pm: 'Carla Duarte', st: 'Planejamento', pct: 8, prazo: '15/02/27', valor: 390000, ult: 'há 4 dias', step: 'Escopo', prio: false },
+  { n: '0154', nome: 'Cabine primária — unidade sul', fam: '4 frentes · 15 steps', cli: 'Agro Ipê Alimentos', pm: 'Rafael Marques', st: 'Em execução', pct: 53, prazo: '03/12/26', valor: 2870000, ult: 'ontem, 14:02', step: 'Montagem elétrica', prio: false },
+  { n: '0158', nome: 'Estação de tratamento de efluentes', fam: '3 frentes · 13 steps', cli: 'Agro Ipê Alimentos', pm: 'Bruno Tavares', st: 'Planejamento', pct: 4, prazo: '28/03/27', valor: 5120000, ult: 'há 5 dias', step: 'Escopo', prio: true },
+  { n: '0161', nome: 'Modernização do CLP da linha 4', fam: '2 frentes · 9 steps', cli: 'Bebidas Serrana', pm: 'Aline Rocha', st: 'Em revisão', pct: 22, prazo: '26/01/27', valor: 760000, ult: 'hoje, 07:48', step: 'Projeto executivo', prio: false }
+];
+
+const UPD = {
+  '0124': [
+    { data: '11/09 09:12', texto: 'Alinhamento das esteiras do envase concluído; liberada a fase de testes a vazio.', autor: 'C. Duarte', tipo: 'Avanço de step', cor: COR.exec, step: 'Montagem mecânica' },
+    { data: '09/09 16:20', texto: 'Recebido skid de enchimento (NF 44.192) — conferência sem pendências.', autor: 'L. Prado', tipo: 'Lançamento', cor: COR.rev, step: 'Suprimentos' },
+    { data: '05/09 10:40', texto: 'Avanço físico atualizado de 64% para 72% após medição semanal.', autor: 'C. Duarte', tipo: 'Medição', cor: COR.ok, step: 'Montagem mecânica' },
+    { data: '02/09 08:55', texto: 'Pendência de aterramento apontada na inspeção do cliente.', autor: 'M. Antunes', tipo: 'Apontamento', cor: COR.atraso, step: 'Montagem elétrica' }
+  ],
+  '0129': [
+    { data: '10/09 17:40', texto: 'Comissionamento suspenso: aguardando energização definitiva pela concessionária.', autor: 'B. Tavares', tipo: 'Bloqueio', cor: COR.atraso, step: 'Comissionamento' },
+    { data: '08/09 11:15', texto: 'Malha de sensores do pátio testada em 6 de 9 pontos.', autor: 'J. Ferraz', tipo: 'Avanço de step', cor: COR.exec, step: 'Comissionamento' },
+    { data: '01/09 09:00', texto: 'Replanejamento do prazo enviado ao cliente para aprovação.', autor: 'B. Tavares', tipo: 'Revisão de prazo', cor: COR.rev, step: 'Gestão' }
+  ]
+};
+const UPD_GEN = [
+  { data: 'hoje 08:05', texto: 'Medição semanal registrada; avanço consolidado sem desvio relevante.', autor: 'Equipe PMO', tipo: 'Medição', cor: COR.ok, step: 'Gestão' },
+  { data: '08/09 14:22', texto: 'Documentação de fabricação revisada e devolvida ao fornecedor.', autor: 'PMO', tipo: 'Avanço de step', cor: COR.exec, step: 'Fabricação' },
+  { data: '03/09 10:10', texto: 'Escopo complementar aprovado em ata de reunião.', autor: 'PMO', tipo: 'Apontamento', cor: COR.rev, step: 'Gestão' }
+];
+
+const STEPS = ['Escopo', 'Projeto executivo', 'Suprimentos', 'Fabricação', 'Obra civil', 'Montagem mecânica', 'Montagem elétrica', 'Comissionamento', 'Encerramento'];
+
+function brl(v) {
+  if (v >= 1000000) return 'R$ ' + (v / 1000000).toFixed(2).replace('.', ',') + ' M';
+  return 'R$ ' + (v / 1000).toFixed(0) + ' k';
+}
+
+class Component extends DCLogic {
+  state = { view: 'list', mode: null, aberta: null, id: null, pm: 'all', cli: 'all', st: 'all', step: 'all', per: 'all', q: '', atraso: false, prio: false };
+
+  get mode() { return this.state.mode || this.props.modoInicial || 'tabela'; }
+
+  filtered() {
+    const s = this.state;
+    const ordem = this.props.ordem || 'asc';
+    let out = P.filter(p =>
+      (s.pm === 'all' || p.pm === s.pm) &&
+      (s.cli === 'all' || p.cli === s.cli) &&
+      (s.st === 'all' || p.st === s.st) &&
+      (s.step === 'all' || p.step === s.step) &&
+      (!s.atraso || p.st === 'Atrasado') &&
+      (!s.prio || p.prio) &&
+      (s.q === '' || p.n.indexOf(s.q) === 0 || p.nome.toLowerCase().indexOf(s.q.toLowerCase()) > -1)
+    );
+    if (s.per === '2026') out = out.filter(p => p.prazo.endsWith('26'));
+    if (s.per === '2027') out = out.filter(p => p.prazo.endsWith('27'));
+    if (s.per === '90d') out = out.filter(p => ['08/26', '09/26', '10/26', '11/26'].indexOf(p.prazo.slice(3)) > -1);
+    out = out.slice().sort((a, b) => ordem === 'asc' ? a.n.localeCompare(b.n) : b.n.localeCompare(a.n));
+    return out;
+  }
+
+  row(p) {
+    const ups = UPD[p.n] || UPD_GEN;
+    return {
+      numero: p.n, nome: p.nome, familia: p.fam, cliente: p.cli, pm: p.pm,
+      pmIni: p.pm.split(' ').map(w => w[0]).join('').slice(0, 2),
+      status: p.st, cor: STCOR[p.st], pctW: p.pct + '%', pctT: p.pct + '%',
+      prazo: p.prazo, corPrazo: p.st === 'Atrasado' ? COR.atraso : '#2C3E50',
+      valor: this.props.mostrarValores === false ? '—' : brl(p.valor),
+      ultima: p.ult, aberta: this.state.aberta === p.n, caret: this.state.aberta === p.n ? '▼' : '▶',
+      updates: ups,
+      stepsFeitos: Math.max(1, Math.round(p.pct / 100 * 9)) + ' / 9',
+      qtdLanc: String(6 + (Number(p.n) % 11)),
+      realizado: this.props.mostrarValores === false ? '—' : brl(p.valor * p.pct / 100),
+      qtdEquipe: String(4 + (Number(p.n) % 5)),
+      toggle: () => this.setState(s => ({ aberta: s.aberta === p.n ? null : p.n })),
+      abrir: () => this.setState({ view: 'detail', id: p.n })
+    };
+  }
+
+  detail() {
+    const p = P.find(x => x.n === this.state.id);
+    if (!p) return null;
+    const idx = STEPS.indexOf(p.step);
+    const steps = STEPS.map((nome, i) => {
+      const done = i < idx, cur = i === nome && false;
+      const pct = i < idx ? 100 : (i === idx ? Math.max(15, p.pct % 100 || 60) : 0);
+      return {
+        n: String(i + 1), nome,
+        pct, pctW: pct + '%', pctT: pct + '%',
+        cor: pct === 100 ? COR.ok : (pct > 0 ? (p.st === 'Atrasado' ? COR.atraso : COR.exec) : '#C0CEDB'),
+        janela: ['jan–fev', 'fev–abr', 'abr–mai', 'mai–jul', 'jul–ago', 'ago–out', 'out–nov', 'nov–dez', 'dez–jan'][i],
+        resp: ['PMO', 'Eng.', 'Compras', 'Fábrica', 'Obra', 'Mont.', 'Elétr.', 'Com.', 'PMO'][i]
+      };
+    });
+    const ups = UPD[p.n] ? UPD[p.n].concat(UPD_GEN) : UPD_GEN;
+    const lanc = [
+      { data: '09/09/26', desc: 'Medição nº 08 — avanço físico do mês', tipo: 'Receita', v: p.valor * 0.08 },
+      { data: '05/09/26', desc: 'Materiais elétricos (NF 44.192)', tipo: 'Custo direto', v: -p.valor * 0.041 },
+      { data: '29/08/26', desc: 'Mão de obra de montagem — 2ª quinzena', tipo: 'Custo direto', v: -p.valor * 0.027 },
+      { data: '22/08/26', desc: 'Aditivo de escopo aprovado', tipo: 'Receita', v: p.valor * 0.035 },
+      { data: '14/08/26', desc: 'Locação de plataforma elevatória', tipo: 'Custo indireto', v: -p.valor * 0.009 }
+    ].map(l => ({ data: l.data, desc: l.desc, tipo: l.tipo, valor: (l.v > 0 ? '+' : '−') + brl(Math.abs(l.v)).replace('R$ ', 'R$ '), cor: l.v > 0 ? COR.ok : '#2C3E50' }));
+    const graf = ['abr', 'mai', 'jun', 'jul', 'ago', 'set'].map((mes, i) => {
+      const plan = Math.min(100, 12 + i * 15);
+      const real = Math.min(100, Math.max(4, plan - (p.st === 'Atrasado' ? 14 + i * 2 : (p.pct > 60 ? -3 : 6))));
+      return { mes, planH: plan + '%', realH: real + '%' };
+    });
+    return {
+      breadcrumb: 'Carteira / ' + p.cli + ' / BSP ' + p.n,
+      numero: 'BSP ' + p.n, nome: p.nome, cliente: p.cli, pm: p.pm, status: p.st, cor: STCOR[p.st],
+      step: p.step, ultima: p.ult, pctT: p.pct + '%',
+      steps, timeline: ups, lancamentos: lanc, grafico: graf,
+      saldo: this.props.mostrarValores === false ? '—' : brl(p.valor * 0.31),
+      clienteInfo: [
+        { k: 'Razão social', v: p.cli }, { k: 'CNPJ', v: '12.884.' + p.n + '/0001-09' },
+        { k: 'Contrato', v: 'CT-' + p.n + '/26' }, { k: 'Orçamento', v: this.props.mostrarValores === false ? '—' : brl(p.valor) },
+        { k: 'Contato', v: 'M. Antunes' }, { k: 'Prazo contratual', v: p.prazo }
+      ],
+      equipe: [
+        { nome: p.pm, papel: 'Gerente de projeto', ini: p.pm.split(' ').map(w => w[0]).join('').slice(0, 2), aloc: '40%' },
+        { nome: 'Luiza Prado', papel: 'Suprimentos', ini: 'LP', aloc: '25%' },
+        { nome: 'João Ferraz', papel: 'Eng. eletricista', ini: 'JF', aloc: '60%' },
+        { nome: 'Marcos Antunes', papel: 'Fiscal do cliente', ini: 'MA', aloc: '—' }
+      ],
+      docs: [
+        { ext: 'PDF', nome: 'Contrato CT-' + p.n + '-26 assinado.pdf', meta: '2,4 MB · 18/02/26' },
+        { ext: 'DWG', nome: 'Unifilar geral rev.C.dwg', meta: '8,1 MB · 04/07/26' },
+        { ext: 'XLSX', nome: 'Cronograma físico-financeiro.xlsx', meta: '640 kB · 01/09/26' },
+        { ext: 'PDF', nome: 'Medição 08 — relatório.pdf', meta: '1,1 MB · 09/09/26' }
+      ],
+      comentarios: [
+        { autor: 'Marcos Antunes', ini: 'MA', data: '10/09 18:02', texto: 'Precisamos fechar a pendência de aterramento antes da próxima inspeção.' },
+        { autor: p.pm, ini: p.pm.split(' ').map(w => w[0]).join('').slice(0, 2), data: '11/09 08:20', texto: 'Equipe realoca dois eletricistas amanhã; previsão de fechar até sexta.' }
+      ]
+    };
+  }
+
+  opts(key, label) {
+    const vals = [];
+    P.forEach(p => { if (vals.indexOf(p[key]) < 0) vals.push(p[key]); });
+    return [{ v: 'all', t: label }].concat(vals.sort().map(v => ({ v, t: v })));
+  }
+
+  chip(on) {
+    return 'height: 32px; padding: 0 12px; border-radius: 5px; font-size: 12px; cursor: pointer; border: 1px solid ' +
+      (on ? '#1355C2; background: #1355C2; color: #fff;' : '#C9D5E2; background: #fff; color: #2C3E50;');
+  }
+  tab(on) {
+    return 'height: 32px; padding: 0 14px; border: 0; font-size: 12px; cursor: pointer; background: ' +
+      (on ? '#0E2033; color: #FFFFFF;' : 'transparent; color: #55677A;');
+  }
+
+  renderVals() {
+    const rows = this.filtered().map(p => this.row(p));
+    const groupsMap = {};
+    this.filtered().forEach(p => { (groupsMap[p.cli] = groupsMap[p.cli] || []).push(p); });
+    const groups = Object.keys(groupsMap).sort().map(cli => {
+      const items = groupsMap[cli];
+      const soma = items.reduce((a, b) => a + b.valor, 0);
+      return {
+        cliente: cli, items: items.map(p => this.row(p)),
+        resumo: items.length + ' BSP · ' + (this.props.mostrarValores === false ? '' : brl(soma) + ' · ') + Math.round(items.reduce((a, b) => a + b.pct, 0) / items.length) + '% médio'
+      };
+    });
+    const all = this.filtered();
+    const d = this.state.view === 'detail' ? this.detail() : null;
+    return {
+      isList: this.state.view === 'list', isDetail: this.state.view === 'detail', d,
+      isTable: this.state.view === 'list' && this.mode === 'tabela',
+      isBoard: this.state.view === 'list' && this.mode === 'quadros',
+      relogio: '11 set 2026 · 11:42',
+      rows, groups,
+      kpiTotal: String(P.length),
+      kpiAtraso: String(P.filter(p => p.st === 'Atrasado').length),
+      kpiAvanco: Math.round(P.reduce((a, b) => a + b.pct, 0) / P.length) + '%',
+      kpiValor: this.props.mostrarValores === false ? '—' : brl(P.reduce((a, b) => a + b.valor, 0)),
+      contagem: all.length + ' de ' + P.length + ' BSPs',
+      statusBar: this.state.view === 'detail' ? 'Arquivo do projeto aberto · dados sincronizados há 3 min' : 'Carteira ordenada por número · ' + all.length + ' registros',
+      optsPm: this.opts('pm', 'PM: todos'), optsCliente: this.opts('cli', 'Cliente: todos'),
+      optsStatus: this.opts('st', 'Status: todos'), optsStep: this.opts('step', 'Etapa: todas'),
+      optsPeriodo: [{ v: 'all', t: 'Período: tudo' }, { v: '90d', t: 'Próximos 90 dias' }, { v: '2026', t: 'Entrega em 2026' }, { v: '2027', t: 'Entrega em 2027' }],
+      fPm: this.state.pm, fCliente: this.state.cli, fStatus: this.state.st, fStep: this.state.step, fPeriodo: this.state.per, fBusca: this.state.q,
+      onPm: e => this.setState({ pm: e.target.value, aberta: null }),
+      onCliente: e => this.setState({ cli: e.target.value, aberta: null }),
+      onStatus: e => this.setState({ st: e.target.value, aberta: null }),
+      onStep: e => this.setState({ step: e.target.value, aberta: null }),
+      onPeriodo: e => this.setState({ per: e.target.value, aberta: null }),
+      onBusca: e => this.setState({ q: e.target.value, aberta: null }),
+      toggleAtraso: () => this.setState(s => ({ atraso: !s.atraso })),
+      togglePrio: () => this.setState(s => ({ prio: !s.prio })),
+      chipAtraso: this.chip(this.state.atraso), chipPrio: this.chip(this.state.prio),
+      limpar: () => this.setState({ pm: 'all', cli: 'all', st: 'all', step: 'all', per: 'all', q: '', atraso: false, prio: false }),
+      setTable: () => this.setState({ mode: 'tabela' }), setBoard: () => this.setState({ mode: 'quadros' }),
+      tabBtnA: this.tab(this.mode === 'tabela'), tabBtnB: this.tab(this.mode === 'quadros'),
+      voltar: () => this.setState({ view: 'list' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>
