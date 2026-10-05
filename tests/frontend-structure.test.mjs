@@ -29,3 +29,11 @@ test('dimensoes e navegacao originais foram preservadas', () => {
   assert.match(area, /Área de medição/);
   assert.match(area, /Ferramental Habitat\.dc\.html/);
 });
+
+
+test('login Supabase protege os dados reais no Pages', async () => {
+  const bootstrap = await readFile(new URL('../bootstrap-live.js', import.meta.url), 'utf8');
+  assert.match(bootstrap, /grant_type=password/);
+  assert.match(bootstrap, /grant_type=refresh_token/);
+  assert.match(bootstrap, /Authorization: 'Bearer '/);
+});
