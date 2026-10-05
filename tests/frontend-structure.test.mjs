@@ -10,10 +10,17 @@ test('pagina inicial e Area de Medicao sao literalmente iguais', () => {
   assert.equal(root, area);
 });
 
-test('modelo original do ZIP usa o runtime dc original', () => {
+test('modelo original do ZIP preserva o runtime dc e carrega dados antes dele', () => {
   assert.match(area, /<x-dc>/);
-  assert.match(area, /<script src="\.\/support\.js"><\/script>/);
+  assert.match(area, /<script src="\.\/bootstrap-live\.js"><\/script>/);
+  assert.doesNotMatch(area, /<script src="\.\/support\.js"><\/script>/);
   assert.match(suporte, /dc-runtime/);
+});
+
+test('prototipo real usa RDO e evita indexacao temporaria', () => {
+  assert.match(area, /RDO registrado/);
+  assert.match(area, /STEP_LIVE_DATA/);
+  assert.match(area, /noindex,nofollow,noarchive/);
 });
 
 test('dimensoes e navegacao originais foram preservadas', () => {
@@ -21,4 +28,12 @@ test('dimensoes e navegacao originais foram preservadas', () => {
   assert.match(area, /Carteira de BSPs/);
   assert.match(area, /Área de medição/);
   assert.match(area, /Ferramental Habitat\.dc\.html/);
+});
+
+
+test('login Supabase protege os dados reais no Pages', async () => {
+  const bootstrap = await readFile(new URL('../bootstrap-live.js', import.meta.url), 'utf8');
+  assert.match(bootstrap, /grant_type=password/);
+  assert.match(bootstrap, /grant_type=refresh_token/);
+  assert.match(bootstrap, /Authorization: 'Bearer '/);
 });

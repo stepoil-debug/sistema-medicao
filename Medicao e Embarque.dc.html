@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<script src="./bootstrap-live.js"></script>
 </head>
 <body>
 <x-dc>
@@ -726,6 +727,7 @@ const DIAS = (() => {
   return out;
 })();
 const CODES = {
+  R: { bg: '#E8EEF6', fg: '#425B73', nome: 'RDO registrado', mini: '#93A6B8' },
   E: { bg: '#DCEEFD', fg: '#0E4AA8', nome: 'Dias embarcados', mini: '#6FAEE9' },
   P: { bg: '#DDF3E9', fg: '#1B7A55', nome: 'MOB / Embarque', mini: '#3CB88A' },
   D: { bg: '#FFF0D9', fg: '#A45F00', nome: 'Desembarque', mini: '#F0B14F' },
@@ -748,7 +750,7 @@ const META = ['23/09 · C. Duarte', '24/09 · R. Marques', '25/09 · e-mail ao f
 const A = [['E', 0, 4], ['D', 5], ['HO', 18], ['P', 19], ['E', 20, 30]];
 const B = [['HO', 4], ['P', 5], ['E', 6, 18], ['D', 19]];
 
-const BSPS = [
+const FALLBACK_BSPS = [
   { n: '25-481', bm: '009', cli: 'Brava Mar', un: 'SS-74 Estrela', po: '4500790114', poVal: 410000, emit: 352300, st: 'Faturado', pm: 'Aline Rocha',
     pessoas: [['IVONEI SANTANA DE BRITO', 'Soldador', 1332, [['P', 2], ['E', 3, 15], ['D', 16]]], ['RONALD SANTOS', 'Caldeireiro', 1332, [['P', 2], ['E', 3, 15], ['DO', 16], ['D', 17]]], ['GUSTAVO LEAL', 'Inspetor de solda', 1580, [['P', 16], ['E', 17, 29], ['D', 30]]]],
     horas: [], logistica: [['Ivonei Santana de Brito', '04/04/2026', 1, 562.4, 213.32, 1338.12], ['Ronald Santos', '18/04/2026', 1, 562.4, 213.32, 1338.12]], rentals: [], consumiveis: [] },
@@ -770,6 +772,7 @@ const BSPS = [
     pessoas: [['HÉLIO BARROS', 'Supervisor offshore', 1850, [['P', 20], ['E', 21, 30]]], ['MARCOS PINA', 'Soldador', 1332, [['P', 20], ['E', 21, 30]]], ['DIEGO RAMOS', 'Caldeireiro', 1332, [['EC', 18], ['HO', 19], ['P', 20], ['E', 21, 30]]]],
     horas: [], logistica: [], rentals: [], consumiveis: [] }
 ];
+const BSPS = (window.STEP_LIVE_DATA?.medicaoBsps?.length ? window.STEP_LIVE_DATA.medicaoBsps : FALLBACK_BSPS);
 
 const AGENDA = [
   { t: 'd', dia: '01', mes: 'OUT 2026', nome: 'Tiago Bittencourt', funcao: 'Soldador', bsp: '26-143-02', un: 'CHERNE 2' },
@@ -790,18 +793,24 @@ function brl(v) { return 'R$ ' + (Math.round(v * 100) / 100).toLocaleString('pt-
 function tc(s) { return s.toLowerCase().replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase()).replace(/\b(Da|De|Do|Dos|Das)\b/g, m => m.toLowerCase()); }
 function ini(n) { const p = n.split(' ').filter(Boolean); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 function seq(spec) { const a = Array(31).fill(''); spec.forEach(([c, f, t]) => { for (let i = f; i <= (t == null ? f : t); i++) a[i] = c; }); return a; }
-function numKey(n) { return n.split('-').map(x => x.padStart(5, '0')).join('-'); }
+function numKey(n) { return String(n).split('-').map(x => x.padStart(5, '0')).join('-'); }
+function bmNum(v) { const x = parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10); return Number.isFinite(x) ? x : 0; }
 
 function pessoa(p, bsp) {
   const [nome, funcao, rate, spec] = p;
-  const cod = seq(spec);
+  const cod = seq(spec || []);
   const emb = cod.filter(c => c === 'E' || c === 'P').length;
+  const rdo = cod.filter(c => c === 'R').length;
+  const dias = emb + rdo;
   const dob = cod.filter(c => c === 'DO').length;
   const can = cod.filter(c => c === 'EC' || c === 'MEC').length;
-  const total = emb * rate + dob * rate * 2 + can * rate * 0.5;
+  const hasRate = typeof rate === 'number' && Number.isFinite(rate) && rate > 0;
+  const total = hasRate ? (emb * rate + dob * rate * 2 + can * rate * 0.5) : 0;
   return {
-    nome: tc(nome), ini: ini(nome), funcao, bsp, rate: brl(rate), emb: String(emb), dob: String(dob), can: String(can),
-    embN: emb, dobN: dob, totalN: total, total: brl(total),
+    nome: tc(nome), ini: ini(nome), funcao, bsp,
+    rate: hasRate ? brl(rate) : 'Rate pendente',
+    emb: String(dias), dob: String(dob), can: String(can),
+    embN: dias, dobN: dob, totalN: total, total: hasRate ? brl(total) : '—',
     onboard: ['E', 'P', 'DO'].indexOf(cod[30]) > -1,
     cells: cod.map((c, i) => c ? { t: c, bg: CODES[c].bg, fg: CODES[c].fg, col: DIAS[i].col, mini: CODES[c].mini } : { t: '', bg: 'transparent', fg: 'transparent', col: DIAS[i].col, mini: '#EEF3F9' })
   };
@@ -809,22 +818,32 @@ function pessoa(p, bsp) {
 
 function calc(b0, st, ov) {
   const b = Object.assign({ periodo: '26/08 a 25/09/2026' }, b0, ov || {});
-  const pessoas = b.pessoas.map(p => pessoa(p, b.n));
-  const horas = b.horas.map(([nome, funcao, tipo, dias, h, r]) => ({ nome, funcao, tipo, dias: dias.map(i => DIAS[i].d + '/' + String(DIAS[i].m).padStart(2, '0')).join(', '), horas: h + ' h', rate: brl(r), totalN: h * r, total: brl(h * r) }));
-  const logistica = b.logistica.map(([nome, data, qtd, v, mk, t]) => ({ nome, data, qtd: String(qtd), valor: brl(v), markup: brl(mk), totalN: t, total: brl(t) }));
-  const rentals = b.rentals.map(([desc, tag, entrega, nf, dias, r]) => ({ desc, tag, entrega, nf, dias: String(dias), rate: r ? brl(r) : 'incluso', totalN: dias * r, total: brl(dias * r), cor: r ? '#0B2340' : '#93A6B8' }));
-  const consumiveis = b.consumiveis.map(([nf, material, un, qtd, data]) => ({ nf, material, un: brl(un), qtd: String(qtd), data, totalN: un * qtd, total: brl(un * qtd) }));
+  const pessoas = (b.pessoas || []).map(p => pessoa(p, b.n));
+  const horas = (b.horas || []).map(([nome, funcao, tipo, dias, h, r]) => {
+    const hasRate = typeof r === 'number' && Number.isFinite(r) && r > 0;
+    return { nome, funcao, tipo, dias: dias.map(i => DIAS[i].d + '/' + String(DIAS[i].m).padStart(2, '0')).join(', '), horas: h + ' h', rate: hasRate ? brl(r) : 'Rate pendente', totalN: hasRate ? h * r : 0, total: hasRate ? brl(h * r) : '—' };
+  });
+  const logistica = (b.logistica || []).map(([nome, data, qtd, v, mk, t]) => ({ nome, data, qtd: String(qtd), valor: brl(v), markup: brl(mk), totalN: t, total: brl(t) }));
+  const rentals = (b.rentals || []).map(([desc, tag, entrega, nf, dias, r]) => ({ desc, tag, entrega, nf, dias: String(dias), rate: r ? brl(r) : 'incluso', totalN: dias * r, total: brl(dias * r), cor: r ? '#0B2340' : '#93A6B8' }));
+  const consumiveis = (b.consumiveis || []).map(([nf, material, un, qtd, data]) => ({ nf, material, un: brl(un), qtd: String(qtd), data, totalN: un * qtd, total: brl(un * qtd) }));
   const sum = a => a.reduce((x, y) => x + y.totalN, 0);
   const vals = { diarias: sum(pessoas), horas: sum(horas), logistica: sum(logistica), mob: 0, habitat: 0, rentals: sum(rentals), consumiveis: sum(consumiveis) };
+  if (b.real && b.bms && b.bms[0] && b.bms[0][3]) {
+    const s = b.bms[0][3];
+    ['diarias','horas','logistica','mob','habitat','rentals','consumiveis'].forEach(k => {
+      if (s[k] != null) vals[k] = Number(s[k]) || 0;
+    });
+  }
   const counts = { diarias: pessoas.length, horas: horas.length, logistica: logistica.length, mob: 0, habitat: 0, rentals: rentals.length, consumiveis: consumiveis.length };
   if (b.off) Object.keys(b.off).forEach(k => { if (b.off[k]) vals[k] = 0; });
-  const atual = Object.keys(vals).reduce((a, k) => a + vals[k], 0);
+  const calculated = Object.keys(vals).reduce((a, k) => a + vals[k], 0);
+  const atual = b.real && b.bmValue != null ? (Number(b.bmValue) || 0) : calculated;
   const saldo = b.poVal ? b.poVal - b.emit - atual : null;
   return Object.assign({}, b, { st, pessoas, horas, logistica, rentals, consumiveis, vals, counts, atual, saldo });
 }
 
 class Component extends DCLogic {
-  state = { tela: 'painel', bsp: '26-143-02', secao: 'resumo', filtro: 'todas', st: {}, ov: {}, novoBsp: '25-687', novoPer: '0', novoOff: {}, aberta: null, bmAberto: null };
+  state = { tela: 'painel', bsp: BSPS[0] ? BSPS[0].n : '26-143-02', secao: 'resumo', filtro: 'todas', st: {}, ov: {}, novoBsp: BSPS[0] ? BSPS[0].n : '25-687', novoPer: '0', novoOff: {}, aberta: null, bmAberto: null };
 
 
   menuCard(on, n, nome, badge, meta, pct, done, click) {
@@ -853,10 +872,26 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const all = BSPS.map(b => calc(b, s.st[b.n] || b.st, s.ov[b.n])).sort((a, b) => numKey(a.n).localeCompare(numKey(b.n)));
+    const liveMode = all.some(b => b.real);
     const go = (tela, extra) => () => this.setState(Object.assign({ tela }, extra || {}));
 
     all.forEach(b => {
-      const n = Number(b.bm), lista = [];
+      if (b.real) {
+        const meta = b.bmMeta || {};
+        b.bmsLista = [{
+          num: b.bm,
+          periodo: '26/08 – 25/09',
+          criado: b.bm === '—' ? 'Sem BM no BM Control' : 'BM Control · ' + (b.currentBmRawStatus || b.st),
+          st: b.st,
+          total: b.atual,
+          vals: b.vals,
+          atual: true,
+          autor: 'BM Control',
+          datas: ['—', meta.sentPmLabel || '—', meta.sentClientLabel || '—', meta.approvalLabel || '—', meta.sentBillingLabel || '—']
+        }];
+        return;
+      }
+      const n = bmNum(b.bm), lista = [];
       const prevN = Math.min(4, n - 1);
       const pesos = [0.22, 0.27, 0.24, 0.27];
       const base = b.emit > 0 ? b.emit : b.atual * prevN;
@@ -881,14 +916,14 @@ class Component extends DCLogic {
         n: b.n, bm: b.bm, cliente: b.cli, unidade: b.un, status: b.st, stCor: ST[b.st].c, stTint: ST[b.st].t, pm: b.pm,
         po: b.po, poVal: b.poVal ? brl(b.poVal) : '—', emit: b.emit ? brl(b.emit) : '—', atual: brl(b.atual),
         saldo: b.saldo == null ? '—' : brl(b.saldo), saldoCor: b.saldo == null ? '#93A6B8' : (b.saldo < 0 ? '#D93B3B' : '#1B7A55'),
-        aBordo: b.pessoas.filter(p => p.onboard).length + ' de ' + b.pessoas.length,
+        aBordo: b.real ? b.pessoas.length + ' com RDO' : b.pessoas.filter(p => p.onboard).length + ' de ' + b.pessoas.length,
         wEmit: b.poVal ? (b.emit / tot * 100) + '%' : '0%', wAtual: b.poVal ? (b.atual / tot * 100) + '%' : '0%',
         barAtual: excede ? '#E05C5C' : 'linear-gradient(100deg, #0E4AA8, #1E86D8)',
         uso: !b.poVal ? 'PO não informada — saldo não calculado' : (excede ? 'Excede a PO em ' + brl(-b.saldo) : Math.round((b.emit + b.atual) / b.poVal * 100) + '% da PO consumida'),
         usoCor: !b.poVal ? '#A45F00' : (excede ? '#D93B3B' : '#5B7185'),
         abrir: go('bm', { bsp: b.n, secao: 'resumo' }), hist: go('emb', { filtro: b.n }),
         aberta: s.aberta === b.n, caret: s.aberta === b.n ? '▼' : '▶',
-        bmsResumo: b.bmsLista.length + ' de ' + Number(b.bm) + ' boletins · ' + b.bmsLista.filter(x => x.st === 'Faturado').length + ' faturados',
+        bmsResumo: b.real ? (b.bm === '—' ? 'Sem BM no BM Control' : 'BM ' + b.bm + ' · ' + (b.currentBmRawStatus || b.st)) : b.bmsLista.length + ' de ' + bmNum(b.bm) + ' boletins · ' + b.bmsLista.filter(x => x.st === 'Faturado').length + ' faturados',
         bms: b.bmsLista.map(x => {
           const idx = FLUXO.indexOf(x.st), key = b.n + '-' + x.num, ab = s.bmAberto === key;
           const MESN = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -908,7 +943,7 @@ class Component extends DCLogic {
         }),
         menu: [
           this.menuCard(true, '01', 'Boletins gerados', b.bmsLista.length + ' BMs', 'Histórico e status dos boletins', b.bmsLista.filter(x => x.st === 'Faturado').length / Math.max(1, b.bmsLista.length) * 100, false, () => {}),
-          this.menuCard(false, '02', 'Novo boletim', 'BM ' + String(Number(b.bm) + 1).padStart(3, '0'), 'Criar o próximo boletim desta BSP', 0, false, () => this.setState({ tela: 'novo', novoBsp: b.n, novoOff: {} })),
+          this.menuCard(false, '02', 'Novo boletim', 'BM ' + String(bmNum(b.bm) + 1).padStart(3, '0'), 'Criar o próximo boletim desta BSP', 0, false, () => this.setState({ tela: 'novo', novoBsp: b.n, novoOff: {} })),
           this.menuCard(false, '03', 'Boletim de medição', b.st, 'BM ' + b.bm + ' · ' + brl(b.atual), FLUXO.indexOf(b.st) / (FLUXO.length - 1) * 100, b.st === 'Faturado', () => this.setState({ tela: 'bm', bsp: b.n, secao: 'resumo' })),
           this.menuCard(false, '04', 'Controle de embarque', b.pessoas.filter(p => p.onboard).length + ' a bordo', b.pessoas.length + ' pessoas no histograma', b.pessoas.filter(p => p.onboard).length / Math.max(1, b.pessoas.length) * 100, false, () => this.setState({ tela: 'emb', filtro: b.n }))
         ],
@@ -926,7 +961,7 @@ class Component extends DCLogic {
           return ev.sort((a, c) => key(c) - key(a)).slice(0, 4);
         })(),
         resumo: [
-          { k: 'Boletins emitidos', v: String(Math.max(0, Number(b.bm) - 1)) },
+          { k: 'Boletins emitidos', v: String(Math.max(0, bmNum(b.bm) - 1)) },
           { k: 'Pessoas no período', v: String(b.pessoas.length) },
           { k: 'Diárias do BM', v: brl(b.vals.diarias) },
           { k: 'Seções com valor', v: Object.keys(b.vals).filter(k => b.vals[k] > 0).length + ' / 7' }
@@ -935,12 +970,12 @@ class Component extends DCLogic {
     });
 
     const totalAtual = all.reduce((a, b) => a + b.atual, 0);
-    const aBordo = all.reduce((a, b) => a + b.pessoas.filter(p => p.onboard).length, 0);
+    const aBordo = all.reduce((a, b) => a + (b.real ? b.pessoas.length : b.pessoas.filter(p => p.onboard).length), 0);
     const kpis = [
       { k: 'Boletins no período', v: String(all.length) },
       { k: 'Valor em medição', v: brl(totalAtual) },
       { k: 'Aguardando cliente/PM', v: String(all.filter(b => b.st === 'Revisão PM' || b.st === 'Enviado ao cliente').length) },
-      { k: 'Pessoas a bordo hoje', v: String(aBordo) }
+      { k: liveMode ? 'Pessoas com RDO' : 'Pessoas a bordo hoje', v: String(aBordo) }
     ];
 
     const agenda = AGENDA.map(m => ({ dia: m.dia, mes: m.mes, nome: m.nome, funcao: m.funcao, bsp: m.bsp, unidade: m.un, tipo: m.t === 'e' ? 'Embarque' : 'Desembarque', seta: m.t === 'e' ? '↑' : '↓', tint: m.t === 'e' ? '#E9F7F1' : '#FFF3E0', cor: m.t === 'e' ? '#1B7A55' : '#A45F00' }));
@@ -948,6 +983,8 @@ class Component extends DCLogic {
     const alertas = [];
     all.forEach(b => {
       if (!b.poVal) alertas.push({ texto: 'BSP ' + b.n + ' sem valor de PO cadastrado — saldo do contrato não pode ser calculado.', meta: b.cli + ' · BM ' + b.bm, cor: '#E08A00', tint: '#FFF7EC' });
+      if (b.real && b.linkStatus && b.linkStatus !== 'LINKED') alertas.push({ texto: 'BSP ' + b.n + ': ' + (b.linkLabel || b.linkStatus) + ' — vínculo comercial bloqueado.', meta: b.cli + ' · ' + (b.regimeLabel || 'regime a confirmar'), cor: '#D93B3B', tint: '#FDECEA' });
+      if (b.real && !b.sourceApproved) alertas.push({ texto: 'RDO/Timesheet da BSP ' + b.n + ' ainda possui apontamentos sem confirmação/assinatura.', meta: 'Execução encontrada · medição financeira condicionada à confirmação', cor: '#E08A00', tint: '#FFF7EC' });
       if (b.saldo != null && b.saldo < 0) alertas.push({ texto: 'BM ' + b.bm + ' da BSP ' + b.n + ' ultrapassa o saldo da PO.', meta: 'Excedente ' + brl(-b.saldo) + ' · ' + b.cli, cor: '#D93B3B', tint: '#FDECEA' });
     });
     const rasc = all.filter(b => b.st === 'Rascunho').length;
@@ -959,9 +996,9 @@ class Component extends DCLogic {
     const embDias = linhas.reduce((a, p) => a + p.embN, 0), dobDias = linhas.reduce((a, p) => a + p.dobN, 0), embValor = linhas.reduce((a, p) => a + p.totalN, 0);
     const embKpis = [
       { k: 'Pessoas no período', v: String(linhas.length) },
-      { k: 'Dias embarcados', v: String(embDias) },
+      { k: liveMode ? 'Dias com RDO' : 'Dias embarcados', v: String(embDias) },
       { k: 'Dobras', v: String(dobDias) },
-      { k: 'Valor de diárias', v: brl(embValor) }
+      { k: liveMode ? 'Valor por Rate' : 'Valor de diárias', v: liveMode ? 'Rates pendentes' : brl(embValor) }
     ];
     const filtros = [{ id: 'todas', nome: 'Todas as BSPs' }].concat(all.map(b => ({ id: b.n, nome: b.n + ' · ' + b.un }))).map(f => ({ nome: f.nome, style: this.chip(s.filtro === f.id), click: () => this.setState({ filtro: f.id }) }));
     const legenda = Object.keys(CODES).map(c => ({ c, nome: CODES[c].nome, bg: CODES[c].bg, fg: CODES[c].fg }));
@@ -984,12 +1021,12 @@ class Component extends DCLogic {
       const v = cur.vals[x.id];
       return { nome: x.nome, valor: brl(v), cor: v ? '#0B2340' : '#93A6B8', w: cur.atual ? (v / cur.atual * 100) + '%' : '0%', pct: cur.atual ? Math.round(v / cur.atual * 100) + '%' : '0%', click: () => this.setState({ secao: x.id }) };
     });
-    const nPrev = Math.min(4, Number(cur.bm) - 1);
+    const nPrev = cur.real ? 0 : Math.min(4, bmNum(cur.bm) - 1);
     const historico = [];
     if (cur.emit > 0 && nPrev > 0) {
       const pesos = [0.22, 0.27, 0.24, 0.27].slice(0, nPrev), ps = pesos.reduce((a, b) => a + b, 0);
       for (let i = 0; i < nPrev; i++) {
-        const n = String(Number(cur.bm) - nPrev + i).padStart(3, '0');
+        const n = String(bmNum(cur.bm) - nPrev + i).padStart(3, '0');
         const m = ((7 - nPrev + i) % 12 + 12) % 12;
         historico.push({ n, periodo: '26/' + String(m + 1).padStart(2, '0') + ' – 25/' + String(m + 2).padStart(2, '0'), status: 'Faturado', tint: ST['Faturado'].t, cor: ST['Faturado'].c, valor: brl(cur.emit * pesos[i] / ps) });
       }
@@ -1011,12 +1048,12 @@ class Component extends DCLogic {
         { k: 'BM atual', v: brl(cur.atual), cor: '#0B2340' },
         { k: 'Saldo', v: cur.saldo == null ? '—' : brl(cur.saldo), cor: cur.saldo == null ? '#93A6B8' : (cur.saldo < 0 ? '#D93B3B' : '#1B7A55') },
         { k: 'PM', v: cur.pm, cor: '#24374B' },
-        { k: 'Data', v: '23/09/2026', cor: '#24374B' }
+        { k: 'Data', v: cur.real ? ((cur.bmMeta && cur.bmMeta.sentPmLabel) || '—') : '23/09/2026', cor: '#24374B' }
       ],
       etapas: FLUXO.map((nome, i) => {
         const done = i < idx, now = i === idx, last = i === FLUXO.length - 1;
         return {
-          nome, marca: done ? '✓' : String(i + 1), meta: done || now ? META[i] : 'pendente',
+          nome, marca: done ? '✓' : String(i + 1), meta: done || now ? (cur.real ? 'BM Control' : META[i]) : 'pendente',
           bg: done ? '#1B7A55' : (now ? 'linear-gradient(140deg, #1E86D8, #0E4AA8)' : '#FFFFFF'), fg: done || now ? '#FFFFFF' : '#93A6B8',
           borda: done || now ? 'transparent' : '#DCE5EE', cor: done || now ? '#0B2340' : '#93A6B8',
           linha: last ? 'transparent' : (done ? '#3CB88A' : '#E7EFF9')
@@ -1042,7 +1079,7 @@ class Component extends DCLogic {
     const nbRaw = calc(BSPS.find(b => b.n === nb.n), 'Rascunho');
     const periodos = [{ v: '0', t: '26/08 a 25/09/2026' }, { v: '1', t: '26/09 a 25/10/2026' }];
     const perSel = periodos.find(x => x.v === s.novoPer) || periodos[0];
-    const proxNum = String(Number(nb.bm) + 1).padStart(3, '0');
+    const proxNum = String(bmNum(nb.bm) + 1).padStart(3, '0');
     const origem = { diarias: 'Histograma de embarque', horas: 'Apontamento de horas', logistica: 'Logística', mob: 'Logística', habitat: 'Suprimentos', rentals: 'Almoxarifado', consumiveis: 'Compras / NF' };
     const totNovo = SECOES.slice(1).reduce((a, x) => a + (s.novoOff[x.id] ? 0 : nbRaw.vals[x.id]), 0);
     const emitNovo = nb.emit + nb.atual;
@@ -1094,7 +1131,7 @@ class Component extends DCLogic {
       kpis, bsps, qtdBsp: String(all.length), agenda, alertas,
       irEmbarques: go('emb'), irPainel: go('painel'),
       dias: DIAS, linhas, embKpis, filtros, legenda,
-      embTotDias: embDias + ' dias embarcados · ' + dobDias + ' dobras', embTotValor: brl(embValor),
+      embTotDias: embDias + (liveMode ? ' registros RDO · ' : ' dias embarcados · ') + dobDias + ' dobras', embTotValor: liveMode ? 'Rates pendentes' : brl(embValor),
       bm, bspOpts: all.map(b => ({ v: b.n, t: b.n + ' · BM ' + b.bm })),
       trocarBsp: e => this.setState({ bsp: e.target.value, secao: 'resumo' }),
       avancar: () => { if (idx < FLUXO.length - 1) this.setState(st => ({ st: Object.assign({}, st.st, { [cur.n]: FLUXO[idx + 1] }) })); },
