@@ -2,73 +2,37 @@
 
 Repositório oficial do Sistema de Medição da STEP Oil & Gas.
 
-**Produção:** https://stepoil-debug.github.io/sistema-medicao/
+**Site:** https://stepoil-debug.github.io/sistema-medicao/
 
-## Interface oficial
+## Interface de referência
 
-O frontend legado foi removido por completo. O site agora possui somente o novo modelo:
+A interface publicada é baseada **literalmente** no ZIP de referência fornecido pela STEP.
 
-- **Área de medição** — carteira de BSPs, KPIs, pendências, status e abertura do BM.
-- **Medição e embarque** — histograma/apontamentos provenientes de RDO e Timesheet.
-- **Ferramental / Habitat** — estrutura do módulo sem dados fictícios enquanto a fonte não estiver integrada.
-- **Rates** — leitura do catálogo comercial confirmado; edição fica bloqueada no frontend público.
+Foram restaurados sem redesenho:
 
-Não existe fallback para a interface anterior e o runtime legado `support.js` foi excluído.
+- `Area de Medicao.dc.html`
+- `Medicao e Embarque.dc.html`
+- `Ferramental Habitat.dc.html`
+- `Painel BSP.dc.html`
+- `Painel BSP - lateral.dc.html`
+- `Painel BSP - etapas.dc.html`
+- `support.js`
 
-## Dados
+O `index.html` é uma cópia literal de `Area de Medicao.dc.html`, para que o endereço principal do GitHub Pages abra diretamente a tela original da Área de Medição.
 
-O frontend lê somente projeções do domínio de medição:
+A versão reinterpretada criada anteriormente foi removida: `app.js`, `styles.css` e `config.js` não participam mais da interface.
 
-- `public.medicao_dashboard_summary`
-- `public.medicao_dashboard_people`
-- `public.medicao_measurement_sections`
-- `public.medicao_dashboard_lines`
-- `public.medicao_rate_catalog`
+## Fidelidade
 
-Valores que não existem nas fontes reais não são inventados. Onde a integração ainda não existe, a tela mostra **aguardando integração**.
+Os arquivos restaurados foram comparados com os artefatos extraídos do ZIP e validados por igualdade de conteúdo. O CI também testa que:
 
-## Arquitetura
+- `index.html` e `Area de Medicao.dc.html` são iguais;
+- o runtime `dc` original está presente;
+- as dimensões originais `1680 × 1010` foram preservadas;
+- a navegação original entre as telas permanece.
 
-```text
-RDO / Timesheet / Histograma / fontes complementares
-                    ↓
-              snapshot da fonte
-                    ↓
-       contrato / PO / Rates / regras
-                    ↓
-             motor de cálculo
-                    ↓
-                BM versionado
-                    ↓
- revisão PM → cliente → aprovação → faturamento
-                    ↓
-            snapshot imutável
-                    ↓
-          Invoice Backup / PDF / Excel
-```
+## Backend
 
-A base técnica permanece em:
+O schema `medicao`, migrations, motor de cálculo e documentação técnica permanecem no repositório para a integração de dados futura. Eles não alteram o visual original do ZIP.
 
-- `src/domain/` — motor de cálculo sem Rates hard-coded.
-- `supabase/migrations/` — schema, segurança, evidências e snapshots.
-- `tests/` — testes do motor e da estrutura do frontend.
-- `docs/architecture-v1.md` — arquitetura oficial.
-- `docs/target-model-v1.md` — comportamento do modelo enviado pela STEP.
-- `docs/commercial-rules.md` — regras comerciais e evidência.
-- `docs/security-model.md` — autenticação/RLS e escrita protegida.
-- `docs/implementation-status.md` — status de confirmação das regras.
-
-## Segurança
-
-GitHub Pages é somente frontend. A chave publicada é a chave publicável do Supabase; nenhuma `service_role` ou credencial Postgres é enviada ao navegador.
-
-Criação de BM, alteração de Rate, aprovação e faturamento permanecem protegidos até a implantação do controle autenticado descrito na migration V1.
-
-## Qualidade e deploy
-
-```bash
-npm ci
-npm test
-```
-
-O GitHub Pages só publica a `main` quando os testes passam.
+A próxima etapa de integração deve substituir somente as fontes de dados internas do modelo, preservando o HTML, a hierarquia visual e a experiência do ZIP.
