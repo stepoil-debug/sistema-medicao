@@ -88,16 +88,27 @@ drop view if exists public.medicao_live_bms;
 create view public.medicao_live_bms as
 select * from medicao.bm_control_sources;
 
-grant select on public.medicao_live_execution to anon, authenticated, service_role;
-grant select on public.medicao_live_reconciliation to anon, authenticated, service_role;
-grant select on public.medicao_live_context to anon, authenticated, service_role;
-grant select on public.medicao_live_bms to anon, authenticated, service_role;
+revoke all on public.medicao_live_execution from public, anon, authenticated;
+revoke all on public.medicao_live_reconciliation from public, anon, authenticated;
+revoke all on public.medicao_live_context from public, anon, authenticated;
+revoke all on public.medicao_live_bms from public, anon, authenticated;
+
+grant select on public.medicao_live_execution to authenticated, service_role;
+grant select on public.medicao_live_reconciliation to authenticated, service_role;
+grant select on public.medicao_live_context to authenticated, service_role;
+grant select on public.medicao_live_bms to authenticated, service_role;
+
+revoke select on public.medicao_dashboard_people from anon;
+revoke select on public.medicao_dashboard_lines from anon;
+revoke select on public.medicao_dashboard_summary from anon;
+revoke select on public.medicao_measurement_sections from anon;
+revoke select on public.medicao_rate_catalog from anon;
 
 comment on view public.medicao_live_execution is
-'Exposição temporária para protótipo GitHub Pages autorizado pelo responsável do sistema. Revogar anon ao migrar para a intranet.';
+'Dados reais acessíveis apenas com sessão authenticated durante o protótipo GitHub Pages.';
 comment on view public.medicao_live_reconciliation is
-'Reconciliação temporariamente exposta ao protótipo; revogar anon na migração para intranet.';
+'Reconciliação acessível apenas com sessão authenticated durante o protótipo.';
 comment on view public.medicao_live_context is
 'Contexto de projeto temporariamente exposto ao protótipo; revogar anon na migração para intranet.';
 comment on view public.medicao_live_bms is
-'Snapshot real do BM Control para o protótipo temporário. Revogar anon ao migrar para intranet.';
+'Snapshot real do BM Control acessível apenas com sessão authenticated durante o protótipo.';
