@@ -93,22 +93,28 @@ revoke all on public.medicao_live_reconciliation from public, anon, authenticate
 revoke all on public.medicao_live_context from public, anon, authenticated;
 revoke all on public.medicao_live_bms from public, anon, authenticated;
 
-grant select on public.medicao_live_execution to authenticated, service_role;
-grant select on public.medicao_live_reconciliation to authenticated, service_role;
-grant select on public.medicao_live_context to authenticated, service_role;
-grant select on public.medicao_live_bms to authenticated, service_role;
+grant select on public.medicao_live_execution to service_role;
+grant select on public.medicao_live_reconciliation to service_role;
+grant select on public.medicao_live_context to service_role;
+grant select on public.medicao_live_bms to service_role;
 
-revoke select on public.medicao_dashboard_people from anon;
-revoke select on public.medicao_dashboard_lines from anon;
-revoke select on public.medicao_dashboard_summary from anon;
-revoke select on public.medicao_measurement_sections from anon;
-revoke select on public.medicao_rate_catalog from anon;
+revoke all on public.medicao_dashboard_people from public, anon, authenticated;
+revoke all on public.medicao_dashboard_lines from public, anon, authenticated;
+revoke all on public.medicao_dashboard_summary from public, anon, authenticated;
+revoke all on public.medicao_measurement_sections from public, anon, authenticated;
+revoke all on public.medicao_rate_catalog from public, anon, authenticated;
+
+grant select on public.medicao_dashboard_people to service_role;
+grant select on public.medicao_dashboard_lines to service_role;
+grant select on public.medicao_dashboard_summary to service_role;
+grant select on public.medicao_measurement_sections to service_role;
+grant select on public.medicao_rate_catalog to service_role;
 
 comment on view public.medicao_live_execution is
-'Dados reais acessíveis apenas com sessão authenticated durante o protótipo GitHub Pages.';
+'Dados reais acessíveis somente pela API server-side de medição; o navegador usa sessão da Intranet STEP.';
 comment on view public.medicao_live_reconciliation is
-'Reconciliação acessível apenas com sessão authenticated durante o protótipo.';
+'Reconciliação acessível somente pela API server-side de medição.';
 comment on view public.medicao_live_context is
 'Contexto de projeto temporariamente exposto ao protótipo; revogar anon na migração para intranet.';
 comment on view public.medicao_live_bms is
-'Snapshot real do BM Control acessível apenas com sessão authenticated durante o protótipo.';
+'Snapshot real do BM Control acessível somente pela API server-side de medição.';
